@@ -3,9 +3,9 @@
 # ----------------------- #
 
 url: http://zhuguangbin.github.io
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+title: Data Talks
+subtitle: Play with Hadoop/Hive/HBase/Spark/Shark
+author: Zhu Guangbin
 simple_search: http://google.com/search
 description:
 
