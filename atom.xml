@@ -4,7 +4,7 @@
   <title><![CDATA[Data Talks]]></title>
   <link href="http://zhuguangbin.github.io/atom.xml" rel="self"/>
   <link href="http://zhuguangbin.github.io/"/>
-  <updated>2013-07-08T20:06:36+08:00</updated>
+  <updated>2013-07-11T19:31:17+08:00</updated>
   <id>http://zhuguangbin.github.io/</id>
   <author>
     <name><![CDATA[Zhu Guangbin]]></name>
@@ -12,6 +12,73 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Shark初窥]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/09/shark-introduction/"/>
+    <updated>2013-07-09T16:27:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/09/shark-introduction</id>
+    <content type="html"><![CDATA[<h2>Shark简介</h2>
+
+<p>   Shark[1]是UC Berkeley AMPLAB开源的一款数据仓库产品，它完全兼容Hive的HQL语法，但与Hive不同的是，Hive的计算框架采用MapReduce，而Shark采用Spark（也是AMPLAB开源的分布式计算框架，充分利用内存，适合于迭代计算，官方宣称性能比MapReduce好100倍）。所以Hive是SQL on MapReduce，而Shark是Hive on Spark。以下是官方简介：</p>
+
+<blockquote><p>Shark is a large-scale data warehouse system for Spark designed to be compatible with Apache Hive. It can answer Hive QL queries up to 100 times faster than Hive without modification to the existing data nor queries. Shark supports Hive&rsquo;s query language, metastore, serialization formats, and user-defined functions.</p></blockquote>
+
+<p>简要总结下Shark的特性[2]：</p>
+
+<ul>
+<li>builds on Spark</li>
+<li>scales out &amp; fault-tolerant</li>
+<li>supports low-latency, interactive queries through in-memory compution</li>
+<li>support both SQL and complex analytics such as machine learning</li>
+<li>is compatible with Apache Hive (storage, serde, UDF, types, metadata)</li>
+</ul>
+
+
+<h3>Shark的架构</h3>
+
+<p>Shark是架构在Hive之上的，它复用了Hive的架构并增加了一些特性，所以Shark的整个代码量很小，大约1万多行。</p>
+
+<p><img src="http://zhuguangbin.github.io/images/hive_arch.png">
+<img src="http://zhuguangbin.github.io/images/shark_arch.png"></p>
+
+<p>从上两张图中可以看出，Shark复用了Hive的大部分组件，包括：</p>
+
+<ol>
+<li>SQL Parser: Shark完全兼容Hive的HQL语法</li>
+<li>metastore：Shark采用和Hive一样的meta信息，Hive里创建的表用Shark可无缝访问</li>
+<li>SerDe: Shark的序列化机制以及数据类型与Hive完全一致</li>
+<li>UDF: Shark可重用Hive里的所有UDF</li>
+<li>Driver： Shark在Hive的CliDriver基础上进行了一个封装，生成一个SharkCliDriver，这是shark命令的入口</li>
+<li>ThriftServer：Shark在Hive的ThriftServer（支持JDBC/ODBC）基础上，做了一个封装，生成了一个SharkServer，也提供JDBC/ODBC服务。</li>
+</ol>
+
+
+<h3>Shark的使用技巧</h3>
+
+<ol>
+<li>选择运行模式：
+在Shark的CliDriver里，可以通过set shark.exec.mode=shark/hive来选择用shark还是hive来执行HQL</li>
+<li><p>创建缓存表以提高查询速度：
+可以创建缓存表将数据cache在内存中，以提高查询速度。以下两种DDL语法均可以：</p>
+
+<ul>
+<li>CREATE TABLE wiki_small_in_mem TBLPROPERTIES (&ldquo;shark.cache&rdquo; = &ldquo;true&rdquo;) AS SELECT * FROM wiki;</li>
+<li>CREATE TABLE wiki_cached AS SELECT * FROM wiki;</li>
+</ul>
+</li>
+</ol>
+
+
+<h3>参考资料</h3>
+
+<ol>
+<li><a href="https://github.com/amplab/shark/wiki">https://github.com/amplab/shark/wiki</a></li>
+<li><a href="https://speakerdeck.com/zhuguangbin/shark-sql-and-rich-analytics-at-scale">https://speakerdeck.com/zhuguangbin/shark-sql-and-rich-analytics-at-scale</a></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[My first blog on GitHub]]></title>
