@@ -4,7 +4,7 @@
   <title><![CDATA[Data Talks]]></title>
   <link href="http://zhuguangbin.github.io/atom.xml" rel="self"/>
   <link href="http://zhuguangbin.github.io/"/>
-  <updated>2013-07-11T19:31:17+08:00</updated>
+  <updated>2013-07-16T19:40:28+08:00</updated>
   <id>http://zhuguangbin.github.io/</id>
   <author>
     <name><![CDATA[Zhu Guangbin]]></name>
@@ -12,6 +12,373 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Spark Programming Examples]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-examples/"/>
+    <updated>2013-07-16T17:27:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-examples</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Spark Programming User Guide]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide/"/>
+    <updated>2013-07-16T16:27:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Spark安装部署篇]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-deploy/"/>
+    <updated>2013-07-16T11:58:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-deploy</id>
+    <content type="html"><![CDATA[<p>  Spark有以下四种运行模式：</p>
+
+<ul>
+<li>local: 本地单进程模式，用于本地开发测试Spark代码</li>
+<li>standalone：分布式集群模式，Master-Worker架构，Master负责调度，Worker负责具体Task的执行</li>
+<li>on yarn/mesos: ‌运行在yarn/mesos等资源管理框架之上，yarn/mesos提供资源管理，spark提供计算调度，并可与其他计算框架(如MapReduce/MPI/Storm)共同运行在同一个集群之上</li>
+<li>on cloud(EC2): 运行在AWS的EC2之上</li>
+</ul>
+
+
+<p>本章主要介绍本地模式和standalone模式的安装部署配置。</p>
+
+<h3>本地模式</h3>
+
+<p>  <em>注: 本文只介绍Linux的安装部署配置方式，Windows以及Mac下类似，用户请自行参考官方文档</em></p>
+
+<h4>1. 前提条件</h4>
+
+<p>  Spark依赖JDK 6.0以及Scala 2.9.3以上版本，所以首先确保已安装JDK和Scala的合适版本并加入PATH。
+  本节比较简单，不在此赘述。安装完毕，请验证JDK和Scala的版本</p>
+
+<pre><code>hadoop@Aspire-5830TG:~$ echo $JAVA_HOME
+/usr/local/jdk
+hadoop@Aspire-5830TG:~$ java -version
+java version "1.6.0_43"
+Java(TM) SE Runtime Environment (build 1.6.0_43-b01)
+Java HotSpot(TM) 64-Bit Server VM (build 20.14-b01, mixed mode)
+
+hadoop@Aspire-5830TG:~$ echo $SCALA_HOME
+/usr/local/scala
+hadoop@Aspire-5830TG:~$ scala
+Welcome to Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_43).
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala&gt; 
+</code></pre>
+
+<h4>2. 安装Spark</h4>
+
+<p>  Spark的安装和简单，只需要将Spark的安装包download下来，加入PATH即可。我们采用官方v0.7.2版本</p>
+
+<pre><code>cd /user/local  
+wget http://spark-project.org/download/spark-0.7.2-prebuilt-hadoop1.tgz 
+tar zxvf spark-0.7.2-prebuilt-hadoop1.tgz  
+ln -s spark-0.7.2 spark-release  
+
+vim /etc/profile  
+export SPARK_HOME=/usr/local/spark-release
+export PATH=$SPARK_HOME/bin
+</code></pre>
+
+<h4>3. 配置Spark</h4>
+
+<p>  Spark的配置文件只有一个: $SPARK_HOME/conf/spark-env.sh。本地开发模式的配置很简单，只需要配置JAVA_HOME和SCALA_HOME。实例如下：</p>
+
+<pre><code>export JAVA_HOME=/usr/local/jdk  
+export SCALA_HOME=/usr/local/scala  
+# add spark example jar to CLASSPATH  
+export SPARK_EXAMPLES_JAR=$SPARK_HOME/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.2.jar  
+</code></pre>
+
+<h4>4. 测试验证</h4>
+
+<p>  Spark提供了两种运行模式：</p>
+
+<p>  1) run脚本: 用于运行已经生成的jar包中的代码，如Spark自带的example中的SparkPi。</p>
+
+<pre><code>hadoop@Aspire-5830TG:/usr/local/spark-release$ ./run  spark.examples.SparkPi local
+
+# 此处略去一万字....
+Pi is roughly 3.1358
+</code></pre>
+
+<p>  2) spark-shell: 用于interactive programming</p>
+
+<pre><code>hadoop@Aspire-5830TG:/usr/local/spark-release$ ./spark-shell 
+Welcome to
+      ____              __  
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 0.7.2
+      /_/                  
+
+Using Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_43)
+Initializing interpreter...
+13/07/16 15:28:04 WARN Utils: Your hostname, Aspire-5830TG resolves to a loopback address: 127.0.0.1; using 172.16.239.1 instead (on interface vmnet8)
+13/07/16 15:28:04 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+Creating SparkContext...
+Spark context available as sc.
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala&gt; val days = List("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+days: List[java.lang.String] = List(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+
+scala&gt; val daysRDD = sc.parallelize(days)
+daysRDD: spark.RDD[java.lang.String] = ParallelCollectionRDD[0] at  parallelize at &lt;console&gt;:14
+
+scala&gt; daysRDD.count()
+res0: Long = 7
+
+scala&gt; 
+</code></pre>
+
+<h3>Standalone模式</h3>
+
+<p>  <em>Note：Spark是Master-Worker架构，在部署之前需要确定Master/Worker机器。同时，分布式集群模式要共享HDFS上的数据，因此需要在每个节点安装Hadoop。</em></p>
+
+<h4>1. 前提条件</h4>
+
+<pre><code>* 集群模式下，Master节点要能够*ssh无密码登陆*各个Worker节点。 
+* 与本地模式一样，Spark集群的*每个节点*需要安装JDK和Scala。 
+* Spark集群的*每个节点*需要安装Hadoop（作为hadoop client访问HDFS上的数据）。 
+</code></pre>
+
+<h4>2. 安装Spark</h4>
+
+<p>  与本地环境一样，Spark集群的<em>每个节点</em>需要download spark的tar.gz包，解压，并配置环境变量。</p>
+
+<h4>3. 配置Spark</h4>
+
+<p>  分布式集群模式下，Spark的配置文件有两个:</p>
+
+<pre><code>* $SPARK_HOME/conf/slaves
+</code></pre>
+
+<p>  slaves 是一个文本文件，将各个worker节点的IP加进去，一行一个，示例如：</p>
+
+<pre><code>10.2.6.133
+10.2.6.134
+10.2.6.154
+
+* $SPARK_HOME/conf/spark-env.sh文件：
+</code></pre>
+
+<p>  Spark的环境配置文件，定义Spark的Master/Worker以及资源定义，示例如：</p>
+
+<pre><code>export JAVA_HOME=/usr/local/jdk 
+export SCALA_HOME=/usr/local/scala
+
+# SSH related
+export SPARK_SSH_OPTS="-p58422 -o StrictHostKeyChecking=no"
+
+# Spark Master IP
+export SPARK_MASTER_IP=10.2.6.152 
+# set the number of cores to use on worker
+export SPARK_WORKER_CORES=16
+# set how much memory to use on worker
+export SPARK_WORKER_MEMORY=16g
+
+export SPARK_EXAMPLES_JAR=/usr/local/spark-0.7.2/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.2.jar
+
+# LZO codec related
+export LD_LIBRARY_PATH=/usr/local/hadoop/lzo/lib
+export SPARK_LIBRARY_PATH=/usr/local/hadoop/hadoop-release/lib/native/Linux-amd64-64/  
+
+在Spark集群的*每个节点*上配置好以上两个配置文件
+</code></pre>
+
+<h4>4. 启动集群</h4>
+
+<p>  在<em>Master</em>节点上，执行如下命令：</p>
+
+<pre><code>[hadoop@cosmos152 spark-release]$ echo $SPARK_HOME
+/usr/local/spark-release
+[hadoop@cosmos152 spark-release]$ bin/start-all.sh 
+starting spark.deploy.master.Master, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.master.Master-1-cosmos152.hadoop.out
+Master IP: 10.2.6.152
+cd /usr/local/spark-0.7.2/bin/.. ; /usr/local/spark-release/bin/start-slave.sh 1 spark://10.2.6.152:7077
+10.2.6.133: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos133.hadoop.out
+10.2.6.134: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos134.hadoop.out
+10.2.6.154: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos154.hadoop.out
+[hadoop@cosmos152 spark-release]$ 
+</code></pre>
+
+<h4>5. 测试验证</h4>
+
+<p>  推荐部署一个Client节点上，专门用于Spark Job的提交。配置与上述节点一致。在Client节点上，执行以下命令：</p>
+
+<pre><code>hadoop@cosmos155:/usr/local/spark-release$ ./run  spark.examples.SparkPi spark://10.2.6.152:7077
+
+# 此处略去一万字....
+Pi is roughly 3.1358
+</code></pre>
+
+<h3>参考资料：</h3>
+
+<ol>
+<li><a href="http://spark-project.org/docs/latest/index.html">Spark Overview</a></li>
+<li><a href="http://spark-project.org/docs/latest/spark-standalone.html">Standalone Deploy Mode</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Spark核心思想篇]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-core-concept/"/>
+    <updated>2013-07-16T10:58:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-core-concept</id>
+    <content type="html"><![CDATA[<p>Spark的核心思想是RDD，以及对RDD的操作（transformation/action）。本篇简单介绍这些基本概念，以有利于理解Spark的原理。</p>
+
+<h3>(一) RDD(resilient distributed dataset)</h3>
+
+<ol>
+<li><p><strong> RDD的基本概念</strong><br/>
+RDD是AMPLAB提出的一种概念，类似与分布式内存，但又不完全一致（关于RDD与分布式内存的区别可参考<a href="http://www.cs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf">paper</a>）。  <br/>
+RDD在Spark的实现中，其实是一个只读的Scala集合对象，它能够进行分区（partition）以便于分布在各个Worker节点上，同时提供了lineage机制（其实就是维护了当前RDD的父RDD reference以及生成RDD的Operation）保证在Worker节点宕机时自动重建。  <br/>
+RDD是lazy的，不必每次都物化出来，因为它维持了自己的lineage信息，当需要时指向已有的RDD，如果遇到failure而失效重新生成构建即可。  <br/>
+用户可以控制RDD的持久化机制和分区模式。RDD可以只存储在内存中，也可以只存储在磁盘中，当然也可以采用内存+磁盘的混合存储模式。用户可以指定RDD中的一个key选择合适的partitioner来控制RDD的分区模式，这点与MapReduce的partitioner原理一样。</p></li>
+<li><p><strong> RDD是如何构建的？</strong> <br/>
+在Spark中RDD通过以下四种方式构建：</p></li>
+</ol>
+
+
+<p>  1) <em>从文件系统</em></p>
+
+<pre><code>#Load text file from local FS, HDFS, or S3  
+sc.textFile(“file.txt”) 
+sc.textFile(“directory/*.txt”)  
+sc.textFile(“hdfs://namenode:9000/path/file”)   
+</code></pre>
+
+<p>  2) <em>通过Scala集合对象并行化生成</em></p>
+
+<pre><code>#Turn a local collection into an RDD    
+sc.parallelize([1,2,3]) 
+</code></pre>
+
+<p>  3) <em>通过对已存在的RDD transform生成</em><br/>
+  可以通过对一个已存在的RDD的调用transformation operation（比如map/flatMap/filter etc）生成。Spark提供的transformation operation下章介绍，以下是一些例子：</p>
+
+<pre><code>nums = sc.parallelize([1,2,3])  
+
+# Pass each element through a function 
+squares  = nums.map(lambda x: x*x)          # =&gt; {1, 4, 9}  
+
+# Keep elements passing a predicate 
+even  = squares.filter(lambda x:  x % 2  == 0)  # =&gt; {4}    
+
+# Map each element to zero or more others
+nums.flatMap(lambda x: range(0, x))         # =&gt; {0, 0, 1, 0, 1, 2} 
+</code></pre>
+
+<p>  4) <em>通过改变其他RDD的持久化状态</em><br/>
+  RDD是lazy的、临时的。在执行parallel operation时物化创建，用完在内存中销毁。但是用户可以改变cache/save这两种action改变其持久化状态，如下示例：</p>
+
+<pre><code>lines = sc.textFile("hdfs://namenode:9000/path/logfile")
+errors  =  lines.filter(lambda s: s.startswith("ERROR"))
+messages  =  errors.map(lambda s: s.split('\t')[2])
+# cache messages RDD in memory
+messages.cache()
+# save messages RDD to HDFS
+messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
+</code></pre>
+
+<h3>（二）RDD Operations</h3>
+
+<p>  Spark与MapReduce的Map-Shuffle-Reduce计算模型不同，它引入了更细粒度的RDD Operation，有以下两类：</p>
+
+<ul>
+<li>transformation: 生成RDD，从一个已有RDD转换成另一个RDD，如map/filter等</li>
+<li>action: 对RDD的操作，比如count/reduce等</li>
+</ul>
+
+
+<p>  Spark目前支持的RDD Operation如下图：<br/>
+<img src="http://zhuguangbin.github.io/images/spark_transformations_actions.png" alt="Spark Transformations &amp; Actions " /></p>
+
+<h3>（三）Shared Variables</h3>
+
+<p>  Spark提供了两种方式来共享变量：</p>
+
+<ul>
+<li>Broadcast variables: 类似于HDFS的DistributedCache，可用于将小数据分发到各Worker节点，以提高执行效率。如下图所示，利用Broadcast variables实现类似MapReduce的MapJoin：</li>
+</ul>
+
+
+<p><img src="http://zhuguangbin.github.io/images/spark_broadcast_example.png" alt="broadcast_example" /></p>
+
+<ul>
+<li>Accumulators: 类似于MapReduce里的Counter，实现计数统计。如下图所示，利用accumulator实现Counter:</li>
+</ul>
+
+
+<p><img src="http://zhuguangbin.github.io/images/spark_accumulator_example.png" alt="accumulator_example" /></p>
+
+<p><strong>参考资料</strong></p>
+
+<ol>
+<li><a href="http://www.cs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a></li>
+<li><a href="http://www.cs.berkeley.edu/~matei/papers/2010/hotcloud_spark.pdf">Spark: Cluster Computing with Working Sets</a></li>
+<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2013/02/Parallel-Programming-With-Spark-Matei-Zaharia-Strata-2013.pdf">Parallel Programming With Spark</a></li>
+<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2012/06/matei-zaharia-amp-camp-2012-advanced-spark.pdf">Advanced Spark Features</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Spark简介]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-intro/"/>
+    <updated>2013-07-16T09:58:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-intro</id>
+    <content type="html"><![CDATA[<p><a href="http://spark-project.org/">Spark</a>是UC Berkeley大学<a href="https://amplab.cs.berkeley.edu/">AMPLAB</a>开源的分布式处理框架。目前已贡献给Apache社区，成为<a href="http://wiki.apache.org/incubator/SparkProposal">inbubator项目</a>。</p>
+
+<p>关于Spark这种分布式处理框架的定位可参考apache的wiki，如下：</p>
+
+<blockquote><p>Spark is an open source system for <strong>fast and flexible large-scale data analysis</strong>. Spark provides a general purpose runtime that supports low-latency execution in several forms. These include <strong>interactive exploration of very large datasets</strong>, <strong>near real-time stream processing</strong>, and <strong>ad-hoc SQL analytics</strong> (through higher layer extensions). Spark interfaces with HDFS, HBase, Cassandra and several other storage storage layers, and <strong>exposes APIs in Scala, Java and Python</strong>. Background Spark started as U.C. Berkeley research project, designed to efficiently run machine learning algorithms on large datasets. Over time, it has evolved into a general computing engine as outlined above. Spark’s developer community has also grown to include additional institutions, such as universities, research labs, and corporations. Funding has been provided by various institutions including the U.S. National Science Foundation, DARPA, and a number of industry sponsors. See: <a href="https://amplab.cs.berkeley.edu/sponsors/">https://amplab.cs.berkeley.edu/sponsors/</a> for full details.</p></blockquote>
+
+<p>  <strong>简单总结一下Spark的特性：</strong></p>
+
+<ul>
+<li>fast: Spark引入了一种叫做RDD的概念（下一篇详细介绍），官方宣称性能比MapReduce高100倍</li>
+<li>fault-tolerant: Spark的RDD采用lineage（血统）来保存其生成轨迹，一旦节点挂掉，可重新生成来保证Job的自动容错</li>
+<li>scalable: Spark跟MapReduce一样，采用Master-Worker架构，可通过增加Worker来自动扩容</li>
+<li>compatible: Spark的存储接口兼容Hadoop，采用inputformat/outputformat来读取HDFS/HBase/Cassandra/S3 etc上的数据</li>
+<li><p>conciseness: Spark采用Scala语言编写，充分利用了Scala语法的简洁性，以及functional编程的便利，整个Spark项目的代码才2W行。当然Spark不仅仅提供了Scala的API，还提供了Java和Python的API。</p>
+
+<p><strong>Spark的定位（适合的场景）：</strong></p>
+
+<p>MapReduce框架在分布式处理领域取得了巨大的成功，但是MapReduce的优势在于处理大规模无环数据流(acyclic data flows
+)，适合于批处理作业，但在以下两种场景下，MapReduce并不高效：</p></li>
+<li><strong>Iterative jobs</strong>（迭代计算型作业）:
+许多机器学习算法（比如KMeans/Logistic Regression等）会针对同一数据集进行多轮迭代运算，每次迭代，仅仅是函数参数的变化，数据集的变化不大。用MapReduce实现这样的算法（比如mahout），每次迭代将是一个MapReduce Job，而每个MapReduce Job都会重新load数据，然后计算，最后持久化到HDFS，这无疑是巨大的IO开销，也是巨大的时间浪费。如果能够将这些需要多轮迭代的数据集Cache在内存中将会带来极大的性能提升，Spark采用RDD思想做到了这一点。</li>
+<li><p><strong>Interactive analytics</strong>（交互式查询分析）:
+虽然在MapReduce框架之上提供了Hive/Pig这样的类SQL引擎来方便用户进行adhoc query，但是其查询效率仍然是巨大的诟病，通常一次查询需要分钟甚至小时级别，难以达到像数据库一样的交互式查询体验。这归结于MapReduce框架设计的初衷并不是提供交互式处理，而是批处理类型的处理任务，例如MapReduce的Map处理要将中间结果持久化到本地磁盘需要Disk IO开销，shuffle阶段需要将Map中间结果HTTP fetch到Reduce端需要网络IO开销，每个Job的Reduce需要将结果持久化到HDFS才能进行下一次Job，下一次Job又需要重新从HDFS load上一次Job的结果。这种计算模型进行一些大规模数据集的批处理作业是OK的，但是不能够提供快速的交互式adhoc查询（秒级别）。Spark放弃了Map-Shuffle-Reduce这样简单粗暴的编程模型而采用Transformation/Action模型，利用RDD思想能够将中间结果缓存起来而不是持久化，同时提供了一个与Hive一致的SQL接口（Shark）达到了MPP分布式数据库交互式查询的效率（39GB数据/次秒级响应时间）。</p>
+
+<p><strong>后边的几篇文章将会对Spark做深一步的研究</strong></p></li>
+<li><p>核心思想篇： 介绍Spark的核心思想，包括RDD、并行操作（Transform/Action）以及共享变量的设计与实现。</p></li>
+<li>安装部署篇： 介绍如何安装部署Spark，包括本地开发测试环境，以及分布式集群生产环境</li>
+<li>Spark Programming Guide篇： 介绍如何利用Spark的并行编程API进行Spark Task编程</li>
+<li><p>Spark Example篇： 给出一些通用的Spark编程实例</p>
+
+<p><strong>Spark相关资源</strong></p></li>
+<li><p><a href="http://spark-project.org/">官网</a></p></li>
+<li><a href="https://github.com/mesos/spark">Github</a></li>
+<li><a href="http://ampcamp.berkeley.edu/">AMPCamp</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Shark初窥]]></title>

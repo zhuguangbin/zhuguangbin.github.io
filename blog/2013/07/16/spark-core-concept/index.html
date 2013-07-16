@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spark核心思想篇 - Data Talks</title>
+  <meta name="author" content="Zhu Guangbin">
+
+  
+  <meta name="description" content="Spark的核心思想是RDD，以及对RDD的操作（transformation/action）。本篇简单介绍这些基本概念，以有利于理解Spark的原理。 (一) RDD(resilient distributed dataset) RDD的基本概念
+RDD是AMPLAB提出的一种概念， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://zhuguangbin.github.io/blog/2013/07/16/spark-core-concept">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Data Talks" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Data Talks</a></h1>
+  
+    <h2>Play with Hadoop/Hive/HBase/Spark/Shark</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:zhuguangbin.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Spark核心思想篇</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-16T10:58:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Spark的核心思想是RDD，以及对RDD的操作（transformation/action）。本篇简单介绍这些基本概念，以有利于理解Spark的原理。</p>
+
+<h3>(一) RDD(resilient distributed dataset)</h3>
+
+<ol>
+<li><p><strong> RDD的基本概念</strong><br/>
+RDD是AMPLAB提出的一种概念，类似与分布式内存，但又不完全一致（关于RDD与分布式内存的区别可参考<a href="http://www.cs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf">paper</a>）。  <br/>
+RDD在Spark的实现中，其实是一个只读的Scala集合对象，它能够进行分区（partition）以便于分布在各个Worker节点上，同时提供了lineage机制（其实就是维护了当前RDD的父RDD reference以及生成RDD的Operation）保证在Worker节点宕机时自动重建。  <br/>
+RDD是lazy的，不必每次都物化出来，因为它维持了自己的lineage信息，当需要时指向已有的RDD，如果遇到failure而失效重新生成构建即可。  <br/>
+用户可以控制RDD的持久化机制和分区模式。RDD可以只存储在内存中，也可以只存储在磁盘中，当然也可以采用内存+磁盘的混合存储模式。用户可以指定RDD中的一个key选择合适的partitioner来控制RDD的分区模式，这点与MapReduce的partitioner原理一样。</p></li>
+<li><p><strong> RDD是如何构建的？</strong> <br/>
+在Spark中RDD通过以下四种方式构建：</p></li>
+</ol>
+
+
+<p>  1) <em>从文件系统</em></p>
+
+<pre><code>#Load text file from local FS, HDFS, or S3  
+sc.textFile(“file.txt”) 
+sc.textFile(“directory/*.txt”)  
+sc.textFile(“hdfs://namenode:9000/path/file”)   
+</code></pre>
+
+<p>  2) <em>通过Scala集合对象并行化生成</em></p>
+
+<pre><code>#Turn a local collection into an RDD    
+sc.parallelize([1,2,3]) 
+</code></pre>
+
+<p>  3) <em>通过对已存在的RDD transform生成</em><br/>
+  可以通过对一个已存在的RDD的调用transformation operation（比如map/flatMap/filter etc）生成。Spark提供的transformation operation下章介绍，以下是一些例子：</p>
+
+<pre><code>nums = sc.parallelize([1,2,3])  
+
+# Pass each element through a function 
+squares  = nums.map(lambda x: x*x)          # =&gt; {1, 4, 9}  
+
+# Keep elements passing a predicate 
+even  = squares.filter(lambda x:  x % 2  == 0)  # =&gt; {4}    
+
+# Map each element to zero or more others
+nums.flatMap(lambda x: range(0, x))         # =&gt; {0, 0, 1, 0, 1, 2} 
+</code></pre>
+
+<p>  4) <em>通过改变其他RDD的持久化状态</em><br/>
+  RDD是lazy的、临时的。在执行parallel operation时物化创建，用完在内存中销毁。但是用户可以改变cache/save这两种action改变其持久化状态，如下示例：</p>
+
+<pre><code>lines = sc.textFile("hdfs://namenode:9000/path/logfile")
+errors  =  lines.filter(lambda s: s.startswith("ERROR"))
+messages  =  errors.map(lambda s: s.split('\t')[2])
+# cache messages RDD in memory
+messages.cache()
+# save messages RDD to HDFS
+messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
+</code></pre>
+
+<h3>（二）RDD Operations</h3>
+
+<p>  Spark与MapReduce的Map-Shuffle-Reduce计算模型不同，它引入了更细粒度的RDD Operation，有以下两类：</p>
+
+<ul>
+<li>transformation: 生成RDD，从一个已有RDD转换成另一个RDD，如map/filter等</li>
+<li>action: 对RDD的操作，比如count/reduce等</li>
+</ul>
+
+
+<p>  Spark目前支持的RDD Operation如下图：<br/>
+<img src="/images/spark_transformations_actions.png" alt="Spark Transformations &amp; Actions " /></p>
+
+<h3>（三）Shared Variables</h3>
+
+<p>  Spark提供了两种方式来共享变量：</p>
+
+<ul>
+<li>Broadcast variables: 类似于HDFS的DistributedCache，可用于将小数据分发到各Worker节点，以提高执行效率。如下图所示，利用Broadcast variables实现类似MapReduce的MapJoin：</li>
+</ul>
+
+
+<p><img src="/images/spark_broadcast_example.png" alt="broadcast_example" /></p>
+
+<ul>
+<li>Accumulators: 类似于MapReduce里的Counter，实现计数统计。如下图所示，利用accumulator实现Counter:</li>
+</ul>
+
+
+<p><img src="/images/spark_accumulator_example.png" alt="accumulator_example" /></p>
+
+<p><strong>参考资料</strong></p>
+
+<ol>
+<li><a href="http://www.cs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a></li>
+<li><a href="http://www.cs.berkeley.edu/~matei/papers/2010/hotcloud_spark.pdf">Spark: Cluster Computing with Working Sets</a></li>
+<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2013/02/Parallel-Programming-With-Spark-Matei-Zaharia-Strata-2013.pdf">Parallel Programming With Spark</a></li>
+<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2012/06/matei-zaharia-amp-camp-2012-advanced-spark.pdf">Advanced Spark Features</a></li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Zhu Guangbin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-16T10:58:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://zhuguangbin.github.io/blog/2013/07/16/spark-core-concept/" data-via="" data-counturl="http://zhuguangbin.github.io/blog/2013/07/16/spark-core-concept/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/07/16/spark-intro/" title="Previous Post: Spark简介">&laquo; Spark简介</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/07/16/spark-deploy/" title="Next Post: Spark安装部署篇">Spark安装部署篇 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/spark-programming-examples/">Spark Programming Examples</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/spark-programming-user-guide/">Spark Programming User Guide</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/spark-deploy/">Spark安装部署篇</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/spark-core-concept/">Spark核心思想篇</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/spark-intro/">Spark简介</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Zhu Guangbin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
