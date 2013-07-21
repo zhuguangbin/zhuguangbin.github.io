@@ -4,7 +4,7 @@
   <title><![CDATA[Data Talks]]></title>
   <link href="http://zhuguangbin.github.io/atom.xml" rel="self"/>
   <link href="http://zhuguangbin.github.io/"/>
-  <updated>2013-07-16T19:40:28+08:00</updated>
+  <updated>2013-07-21T12:23:07+08:00</updated>
   <id>http://zhuguangbin.github.io/</id>
   <author>
     <name><![CDATA[Zhu Guangbin]]></name>
@@ -23,10 +23,23 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Spark Programming User Guide]]></title>
-    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide/"/>
+    <title type="html"><![CDATA[Spark Programming User Guide For Scala User]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide-for-scalauser/"/>
     <updated>2013-07-16T16:27:00+08:00</updated>
-    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide</id>
+    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide-for-scalauser</id>
+    <content type="html"><![CDATA[<h3>开发环境搭建</h3>
+
+<h3>创建第一个Spark Project</h3>
+
+<h3></h3>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Spark Programming User Guide For Java User]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide-for-javauser/"/>
+    <updated>2013-07-16T16:27:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide-for-javauser</id>
     <content type="html"><![CDATA[
 ]]></content>
   </entry>
@@ -147,10 +160,12 @@ scala&gt;
 
 <h4>1. 前提条件</h4>
 
-<pre><code>* 集群模式下，Master节点要能够*ssh无密码登陆*各个Worker节点。 
-* 与本地模式一样，Spark集群的*每个节点*需要安装JDK和Scala。 
-* Spark集群的*每个节点*需要安装Hadoop（作为hadoop client访问HDFS上的数据）。 
-</code></pre>
+<ul>
+<li>集群模式下，Master节点要能够<em>ssh无密码登陆</em>各个Worker节点。</li>
+<li>与本地模式一样，Spark集群的<em>每个节点</em>需要安装JDK和Scala。</li>
+<li>Spark集群的<em>每个节点</em>需要安装Hadoop（作为hadoop client访问HDFS上的数据）。</li>
+</ul>
+
 
 <h4>2. 安装Spark</h4>
 
@@ -160,17 +175,22 @@ scala&gt;
 
 <p>  分布式集群模式下，Spark的配置文件有两个:</p>
 
-<pre><code>* $SPARK_HOME/conf/slaves
-</code></pre>
+<ul>
+<li>$SPARK_HOME/conf/slaves</li>
+</ul>
+
 
 <p>  slaves 是一个文本文件，将各个worker节点的IP加进去，一行一个，示例如：</p>
 
 <pre><code>10.2.6.133
 10.2.6.134
 10.2.6.154
-
-* $SPARK_HOME/conf/spark-env.sh文件：
 </code></pre>
+
+<ul>
+<li>$SPARK_HOME/conf/spark-env.sh文件：</li>
+</ul>
+
 
 <p>  Spark的环境配置文件，定义Spark的Master/Worker以及资源定义，示例如：</p>
 
@@ -192,9 +212,9 @@ export SPARK_EXAMPLES_JAR=/usr/local/spark-0.7.2/examples/target/scala-2.9.3/spa
 # LZO codec related
 export LD_LIBRARY_PATH=/usr/local/hadoop/lzo/lib
 export SPARK_LIBRARY_PATH=/usr/local/hadoop/hadoop-release/lib/native/Linux-amd64-64/  
-
-在Spark集群的*每个节点*上配置好以上两个配置文件
 </code></pre>
+
+<p>  在Spark集群的<em>每个节点</em>上配置好以上两个配置文件</p>
 
 <h4>4. 启动集群</h4>
 
