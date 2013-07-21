@@ -133,15 +133,15 @@ scala&gt;
 
 <h4>2. 安装Spark</h4>
 
-<p>  Spark的安装和简单，只需要将Spark的安装包download下来，加入PATH即可。我们采用官方v0.7.2版本</p>
+<p>  Spark的安装和简单，只需要将Spark的安装包download下来，加入PATH即可。我们采用官方v0.7.3版本</p>
 
-<pre><code>cd /user/local  
-wget http://spark-project.org/download/spark-0.7.2-prebuilt-hadoop1.tgz 
-tar zxvf spark-0.7.2-prebuilt-hadoop1.tgz  
-ln -s spark-0.7.2 spark-release  
+<pre><code>cd /user/local/spark  
+wget http://spark-project.org/download/spark-0.7.3-prebuilt-hadoop1.tgz 
+tar zxvf spark-0.7.3-prebuilt-hadoop1.tgz  
+ln -s spark-0.7.3 spark-release  
 
 vim /etc/profile  
-export SPARK_HOME=/usr/local/spark-release
+export SPARK_HOME=/usr/local/spark/spark-release
 export PATH=$SPARK_HOME/bin
 </code></pre>
 
@@ -152,7 +152,7 @@ export PATH=$SPARK_HOME/bin
 <pre><code>export JAVA_HOME=/usr/local/jdk  
 export SCALA_HOME=/usr/local/scala  
 # add spark example jar to CLASSPATH  
-export SPARK_EXAMPLES_JAR=$SPARK_HOME/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.2.jar  
+export SPARK_EXAMPLES_JAR=$SPARK_HOME/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.3.jar  
 </code></pre>
 
 <h4>4. 测试验证</h4>
@@ -161,7 +161,7 @@ export SPARK_EXAMPLES_JAR=$SPARK_HOME/examples/target/scala-2.9.3/spark-examples
 
 <p>  1) run脚本: 用于运行已经生成的jar包中的代码，如Spark自带的example中的SparkPi。</p>
 
-<pre><code>hadoop@Aspire-5830TG:/usr/local/spark-release$ ./run  spark.examples.SparkPi local
+<pre><code>hadoop@Aspire-5830TG:/usr/local/spark/spark-release$ ./run  spark.examples.SparkPi local
 
 # 此处略去一万字....
 Pi is roughly 3.1358
@@ -169,12 +169,12 @@ Pi is roughly 3.1358
 
 <p>  2) spark-shell: 用于interactive programming</p>
 
-<pre><code>hadoop@Aspire-5830TG:/usr/local/spark-release$ ./spark-shell 
+<pre><code>hadoop@Aspire-5830TG:/usr/local/spark/spark-release$ ./spark-shell 
 Welcome to
       ____              __  
      / __/__  ___ _____/ /__
     _\ \/ _ \/ _ `/ __/  '_/
-   /___/ .__/\_,_/_/ /_/\_\   version 0.7.2
+   /___/ .__/\_,_/_/ /_/\_\   version 0.7.3
       /_/                  
 
 Using Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_43)
@@ -251,7 +251,7 @@ export SPARK_WORKER_CORES=16
 # set how much memory to use on worker
 export SPARK_WORKER_MEMORY=16g
 
-export SPARK_EXAMPLES_JAR=/usr/local/spark-0.7.2/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.2.jar
+export SPARK_EXAMPLES_JAR=/usr/local/spark/spark-0.7.3/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.3.jar
 
 # LZO codec related
 export LD_LIBRARY_PATH=/usr/local/hadoop/lzo/lib
@@ -265,14 +265,14 @@ export SPARK_LIBRARY_PATH=/usr/local/hadoop/hadoop-release/lib/native/Linux-amd6
 <p>  在<em>Master</em>节点上，执行如下命令：</p>
 
 <pre><code>[hadoop@cosmos152 spark-release]$ echo $SPARK_HOME
-/usr/local/spark-release
+/usr/local/spark/spark-release
 [hadoop@cosmos152 spark-release]$ bin/start-all.sh 
-starting spark.deploy.master.Master, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.master.Master-1-cosmos152.hadoop.out
+starting spark.deploy.master.Master, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.master.Master-1-cosmos152.hadoop.out
 Master IP: 10.2.6.152
-cd /usr/local/spark-0.7.2/bin/.. ; /usr/local/spark-release/bin/start-slave.sh 1 spark://10.2.6.152:7077
-10.2.6.133: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos133.hadoop.out
-10.2.6.134: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos134.hadoop.out
-10.2.6.154: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos154.hadoop.out
+cd /usr/local/spark/spark-0.7.3/bin/.. ; /usr/local/spark/spark-release/bin/start-slave.sh 1 spark://10.2.6.152:7077
+10.2.6.133: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos133.hadoop.out
+10.2.6.134: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos134.hadoop.out
+10.2.6.154: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos154.hadoop.out
 [hadoop@cosmos152 spark-release]$ 
 </code></pre>
 
@@ -280,7 +280,7 @@ cd /usr/local/spark-0.7.2/bin/.. ; /usr/local/spark-release/bin/start-slave.sh 1
 
 <p>  推荐部署一个Client节点上，专门用于Spark Job的提交。配置与上述节点一致。在Client节点上，执行以下命令：</p>
 
-<pre><code>hadoop@cosmos155:/usr/local/spark-release$ ./run  spark.examples.SparkPi spark://10.2.6.152:7077
+<pre><code>hadoop@cosmos155:/usr/local/spark/spark-release$ ./run  spark.examples.SparkPi spark://10.2.6.152:7077
 
 # 此处略去一万字....
 Pi is roughly 3.1358
@@ -335,7 +335,7 @@ Pi is roughly 3.1358
         <a class="basic-alignment left" href="/blog/2013/07/16/spark-core-concept/" title="Previous Post: Spark核心思想篇">&laquo; Spark核心思想篇</a>
       
       
-        <a class="basic-alignment right" href="/blog/2013/07/16/spark-programming-user-guide-for-javauser/" title="Next Post: Spark Programming User Guide For Java User">Spark Programming User Guide For Java User &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2013/07/16/spark-programming-user-guide-basic/" title="Next Post: Spark Programming User Guide Basic">Spark Programming User Guide Basic &raquo;</a>
       
     </p>
   </footer>
@@ -350,11 +350,11 @@ Pi is roughly 3.1358
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/07/16/spark-programming-examples/">Spark Programming Examples</a>
+        <a href="/blog/2013/07/21/shark-deploy/">Shark安装部署</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/07/16/spark-programming-user-guide-for-scalauser/">Spark Programming User Guide for Scala User</a>
+        <a href="/blog/2013/07/16/spark-programming-examples/">Spark Programming Examples</a>
       </li>
     
       <li class="post">
@@ -362,11 +362,11 @@ Pi is roughly 3.1358
       </li>
     
       <li class="post">
-        <a href="/blog/2013/07/16/spark-deploy/">Spark安装部署篇</a>
+        <a href="/blog/2013/07/16/spark-programming-user-guide-for-scalauser/">Spark Programming User Guide for Scala User</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/07/16/spark-core-concept/">Spark核心思想篇</a>
+        <a href="/blog/2013/07/16/spark-programming-user-guide-basic/">Spark Programming User Guide Basic</a>
       </li>
     
   </ul>
