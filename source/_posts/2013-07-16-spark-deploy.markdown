@@ -111,9 +111,9 @@ categories:
   
 ####1. 前提条件  
 
-    * 集群模式下，Master节点要能够*ssh无密码登陆*各个Worker节点。 
-    * 与本地模式一样，Spark集群的*每个节点*需要安装JDK和Scala。 
-    * Spark集群的*每个节点*需要安装Hadoop（作为hadoop client访问HDFS上的数据）。 
+  * 集群模式下，Master节点要能够*ssh无密码登陆*各个Worker节点。 
+  * 与本地模式一样，Spark集群的*每个节点*需要安装JDK和Scala。 
+  * Spark集群的*每个节点*需要安装Hadoop（作为hadoop client访问HDFS上的数据）。 
   
 ####2. 安装Spark  
   
@@ -123,7 +123,7 @@ categories:
 
   分布式集群模式下，Spark的配置文件有两个:
   
-    * $SPARK_HOME/conf/slaves
+  * $SPARK_HOME/conf/slaves
   
   slaves 是一个文本文件，将各个worker节点的IP加进去，一行一个，示例如：
   
@@ -131,7 +131,7 @@ categories:
 	10.2.6.134
 	10.2.6.154
 
-    * $SPARK_HOME/conf/spark-env.sh文件：
+  * $SPARK_HOME/conf/spark-env.sh文件：
   
   Spark的环境配置文件，定义Spark的Master/Worker以及资源定义，示例如：
 
@@ -154,7 +154,7 @@ categories:
 	export LD_LIBRARY_PATH=/usr/local/hadoop/lzo/lib
 	export SPARK_LIBRARY_PATH=/usr/local/hadoop/hadoop-release/lib/native/Linux-amd64-64/  
 	
-    在Spark集群的*每个节点*上配置好以上两个配置文件
+  在Spark集群的*每个节点*上配置好以上两个配置文件
     
 ####4. 启动集群  
   
