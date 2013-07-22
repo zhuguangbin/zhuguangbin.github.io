@@ -42,15 +42,15 @@ categories:
 
 ####2. 安装Spark  
   
-  Spark的安装和简单，只需要将Spark的安装包download下来，加入PATH即可。我们采用官方v0.7.2版本  
+  Spark的安装和简单，只需要将Spark的安装包download下来，加入PATH即可。我们采用官方v0.7.3版本  
 
-	cd /user/local  
-	wget http://spark-project.org/download/spark-0.7.2-prebuilt-hadoop1.tgz 
-	tar zxvf spark-0.7.2-prebuilt-hadoop1.tgz  
-	ln -s spark-0.7.2 spark-release  
+	cd /user/local/spark  
+	wget http://spark-project.org/download/spark-0.7.3-prebuilt-hadoop1.tgz 
+	tar zxvf spark-0.7.3-prebuilt-hadoop1.tgz  
+	ln -s spark-0.7.3 spark-release  
 	
 	vim /etc/profile  
-	export SPARK_HOME=/usr/local/spark-release
+	export SPARK_HOME=/usr/local/spark/spark-release
 	export PATH=$SPARK_HOME/bin
 	
 	
@@ -61,7 +61,7 @@ categories:
 	export JAVA_HOME=/usr/local/jdk  
 	export SCALA_HOME=/usr/local/scala  
 	# add spark example jar to CLASSPATH  
-	export SPARK_EXAMPLES_JAR=$SPARK_HOME/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.2.jar  
+	export SPARK_EXAMPLES_JAR=$SPARK_HOME/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.3.jar  
 	
   
 ####4. 测试验证  
@@ -70,19 +70,19 @@ categories:
   
   1) run脚本: 用于运行已经生成的jar包中的代码，如Spark自带的example中的SparkPi。  
 
-	hadoop@Aspire-5830TG:/usr/local/spark-release$ ./run  spark.examples.SparkPi local
+	hadoop@Aspire-5830TG:/usr/local/spark/spark-release$ ./run  spark.examples.SparkPi local
 	
 	# 此处略去一万字....
 	Pi is roughly 3.1358
 
   2) spark-shell: 用于interactive programming
   
-	hadoop@Aspire-5830TG:/usr/local/spark-release$ ./spark-shell 
+	hadoop@Aspire-5830TG:/usr/local/spark/spark-release$ ./spark-shell 
 	Welcome to
 	      ____              __  
 	     / __/__  ___ _____/ /__
 	    _\ \/ _ \/ _ `/ __/  '_/
-	   /___/ .__/\_,_/_/ /_/\_\   version 0.7.2
+	   /___/ .__/\_,_/_/ /_/\_\   version 0.7.3
 	      /_/                  
 	
 	Using Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_43)
@@ -148,7 +148,7 @@ categories:
 	# set how much memory to use on worker
 	export SPARK_WORKER_MEMORY=16g
 	
-	export SPARK_EXAMPLES_JAR=/usr/local/spark-0.7.2/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.2.jar
+	export SPARK_EXAMPLES_JAR=/usr/local/spark/spark-0.7.3/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.3.jar
 	
 	# LZO codec related
 	export LD_LIBRARY_PATH=/usr/local/hadoop/lzo/lib
@@ -161,20 +161,20 @@ categories:
   在*Master*节点上，执行如下命令：
   
 	[hadoop@cosmos152 spark-release]$ echo $SPARK_HOME
-	/usr/local/spark-release
+	/usr/local/spark/spark-release
 	[hadoop@cosmos152 spark-release]$ bin/start-all.sh 
-	starting spark.deploy.master.Master, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.master.Master-1-cosmos152.hadoop.out
+	starting spark.deploy.master.Master, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.master.Master-1-cosmos152.hadoop.out
 	Master IP: 10.2.6.152
-	cd /usr/local/spark-0.7.2/bin/.. ; /usr/local/spark-release/bin/start-slave.sh 1 spark://10.2.6.152:7077
-	10.2.6.133: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos133.hadoop.out
-	10.2.6.134: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos134.hadoop.out
-	10.2.6.154: starting spark.deploy.worker.Worker, logging to /usr/local/spark-0.7.2/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos154.hadoop.out
+	cd /usr/local/spark/spark-0.7.3/bin/.. ; /usr/local/spark/spark-release/bin/start-slave.sh 1 spark://10.2.6.152:7077
+	10.2.6.133: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos133.hadoop.out
+	10.2.6.134: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos134.hadoop.out
+	10.2.6.154: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos154.hadoop.out
 	[hadoop@cosmos152 spark-release]$ 
 	
 ####5. 测试验证  
   推荐部署一个Client节点上，专门用于Spark Job的提交。配置与上述节点一致。在Client节点上，执行以下命令：
   
-	hadoop@cosmos155:/usr/local/spark-release$ ./run  spark.examples.SparkPi spark://10.2.6.152:7077
+	hadoop@cosmos155:/usr/local/spark/spark-release$ ./run  spark.examples.SparkPi spark://10.2.6.152:7077
 	
 	# 此处略去一万字....
 	Pi is roughly 3.1358
