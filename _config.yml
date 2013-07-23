@@ -7,7 +7,7 @@ title: Data Talks
 subtitle: Play with Hadoop/Hive/HBase/Spark/Shark
 author: Zhu Guangbin
 simple_search: http://google.com/search
-description:
+description: BigData Hadoop Hive HBase Spark Shark 
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -50,7 +50,7 @@ titlecase: true       # Converts page and post titles to titlecase
 
 # list each of the sidebar modules you want to include, in the order you want them to appear.
 # To add custom asides, create files in /source/_includes/custom/asides/ and add them to the list like 'custom/asides/custom_aside_name.html'
-default_asides: [custom/asides/about.html, asides/category_list.html, asides/recent_posts.html, asides/github.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
+default_asides: [custom/asides/about.html, asides/weibo.html, asides/category_list.html, asides/recent_posts.html, asides/github.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
 
 # Each layout uses the default asides, but they can have their own asides instead. Simply uncomment the lines below
 # and add an array with the asides you want to use.
@@ -101,3 +101,12 @@ facebook_like: true
 
 # Duoshuo Comments
 duoshuo_show_comment_count: true
+
+# Weibo  
+# Please refer to http://weibo.com/tool/weiboshow to get your uid and verifier.   
+weibo_uid: 2406795361                 # 填入uid  
+weibo_verifier: f1586320          # 填入verifier  
+weibo_fansline: 0      # 粉丝显示多少行  
+weibo_show: true      # 是否显示最近微博内容  
+weibo_pic: true          # 是否显示微博中的图片  
+weibo_skin: 10          # 使用哪种配色风格，数字为从1开始的微博秀风格序号 
