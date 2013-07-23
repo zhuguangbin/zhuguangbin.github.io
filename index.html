@@ -9,7 +9,7 @@
   <meta name="author" content="Zhu Guangbin">
 
   
-  <meta name="description" content="在搭建部署Spark之后，我们又引入了Shark，一个基于Spark的SQL引擎来替换Hive作为adhoc query engine。我的这篇博客对Shark有简单的介绍。 我们引入Shark是希望利用Spark的性能，提高Hive的执行效率，提供adhoc的interactive的快速查询， &hellip;">
+  <meta name="description" content="为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。 测试工具与方法： 之前写过一个benchmark的sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试； 测试方法就是分别利用Hive和Shark的CliDriver: * time &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -29,6 +29,7 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
 
   
 
@@ -65,6 +66,119 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/23/shark-vs-hive-benchmark-test/">Shark vs Hive Benchmark Test</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-23T13:42:00+08:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。</p>
+
+<h4>测试工具与方法：</h4>
+
+<p>  之前写过一个benchmark的sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试；
+  测试方法就是分别利用Hive和Shark的CliDriver:</p>
+
+<pre><code>* time hive -f hql_benchmark.sql &gt; hive_test_result 2&gt;&amp;1
+* time shark-witherror -f hql_benchmark.sql &gt; shark_test_result 2&gt;&amp;1    
+</code></pre>
+
+<h4>集群资源情况：</h4>
+
+<ul>
+<li>Hive/MapReduce集群：
+
+<ul>
+<li>37 Node, 436 MapSlot &amp; 436 ReduceSlot total, 1 slot per task</li>
+</ul>
+</li>
+<li>Shark/Spark集群：
+
+<ul>
+<li>3 node, 48 core &amp; 48G mem total, 12 core max &amp; 4G mem per node for each client</li>
+</ul>
+</li>
+</ul>
+
+
+<h4>测试结果：</h4>
+
+<p>  测试结果对比如下：</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Hive/Shark  </th>
+<th>real time </th>
+<th>user time  </th>
+<th>sys time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>Hive:       </td>
+<td>23m2.292s </td>
+<td>0m33.430s  </td>
+<td>0m3.014s</td>
+</tr>
+<tr>
+<td></td>
+<td>Shark:      </td>
+<td>1m42.698s </td>
+<td>0m30.694s  </td>
+<td>0m3.193s</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>测试结果解读：</h4>
+
+<ul>
+<li><p>SQL 兼容性：shark完全兼容hive的语法，hive能够执行的语法，shark能够无缝的执行，因此迁移成本为零</p></li>
+<li><p>性能：不言而喻，Shark在集群资源只有三个节点而MR有39的节点下，仍然能够比Hive执行效率高出近13倍</p></li>
+<li><p>原因分析：本次测试，数据量并不算大，所以对于MR和Spark而言，读取文件的IO开销几乎无异。造成执行时间差异如此大的原因在于MR与Spark计算框架的开销。</p></li>
+</ul>
+
+
+<p>  从测试结果看，user time两者的耗时几乎相等，原因是shark和hive在客户端做的事情几乎一致（主要是compile阶段将SQL转化成QueryPlan）。
+  而real time主要耗时在等待集群计算结果上，从计算框架的调度角度来看，MR框架的调度很重，通过heatbeat来分配MapSlot和ReduceSlot，而Spark的Actor模型，比较轻量级；从计算模型来看，MR的Map-Shuffle-Reduce绝大部分的开销在于中间结果的persistence上，IO开销很重，而Spark通过RDD transformation和action操作，并且可以充分利用内存，IO的开销比MR要轻的多</p>
+
+<h4>测试中遇到的问题：</h4>
+
+<p>  在执行join时，偶尔会遇到ArrayIndexOutOfBoundsException的错误，原因是我们的shark采用了Dianping自有的cosmos-hadoop-0.9.0版本（基于apache官方0.9.0版本打过自己的patch），而官方版本有concurrency的问题。在amplab的版本中已经修复过。
+  后续将amplab的concurrency的commit梳理，引入到我们的版本来。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1422,53 +1536,9 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/07/my-first-blog/">My First Blog on GitHub</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-07T17:15:00+08:00" pubdate data-updated="true">Jul 7<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>之前的Blog由于欠费被停了，而且也觉得每年花费那200块钱不值得，故找了找免费的Blog，意外发现了Github Pages，惊喜~</p>
-
-<p>用Markdown像敲代码一样写Blog，而且随时随地记录，然后还能git commit，简直就是技术人员的福音啊</p>
-
-<p>后续准备整理几篇Blog，把最近做的事情梳理一下：</p>
-
-<blockquote><ul>
-<li>Spark&amp;Shark的调研：总结下Spark/Shark的基本思想，安装部署文档，以及遇到的问题</li>
-<li>Hive的代码研究：准备出一个系列，介绍Hive的实现原理</li>
-</ul>
-</blockquote>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/2/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -1479,6 +1549,10 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/07/23/shark-vs-hive-benchmark-test/">Shark vs Hive Benchmark Test</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/21/shark-deploy/">Shark安装部署与应用</a>
@@ -1494,10 +1568,6 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
     
       <li class="post">
         <a href="/blog/2013/07/16/spark-programming-user-guide-for-scalauser/">Spark Programming User Guide for Scala User</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/16/spark-programming-user-guide-basic/">Spark Programming User Guide Basic</a>
       </li>
     
   </ul>

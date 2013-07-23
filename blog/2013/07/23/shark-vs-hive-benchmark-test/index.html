@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Spark Programming Examples - Data Talks</title>
+  <title>Shark vs Hive Benchmark Test - Data Talks</title>
   <meta name="author" content="Zhu Guangbin">
 
   
-  <meta name="description" content="
-">
+  <meta name="description" content="为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。 测试工具与方法： 之前写过一个benchmark的sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试； 测试方法就是分别利用Hive和Shark的CliDriver: * time &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-examples">
+  <link rel="canonical" href="http://zhuguangbin.github.io/blog/2013/07/23/shark-vs-hive-benchmark-test">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Data Talks" type="application/atom+xml">
@@ -70,7 +69,7 @@
   
   <header>
     
-      <h1 class="entry-title">Spark Programming Examples</h1>
+      <h1 class="entry-title">Shark vs Hive Benchmark Test</h1>
     
     
       <p class="meta">
@@ -86,14 +85,91 @@
   
 
 
-<time datetime="2013-07-16T17:27:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
+<time datetime="2013-07-23T13:42:00+08:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content">
+<div class="entry-content"><p>为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。</p>
+
+<h4>测试工具与方法：</h4>
+
+<p>  之前写过一个benchmark的sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试；
+  测试方法就是分别利用Hive和Shark的CliDriver:</p>
+
+<pre><code>* time hive -f hql_benchmark.sql &gt; hive_test_result 2&gt;&amp;1
+* time shark-witherror -f hql_benchmark.sql &gt; shark_test_result 2&gt;&amp;1    
+</code></pre>
+
+<h4>集群资源情况：</h4>
+
+<ul>
+<li>Hive/MapReduce集群：
+
+<ul>
+<li>37 Node, 436 MapSlot &amp; 436 ReduceSlot total, 1 slot per task</li>
+</ul>
+</li>
+<li>Shark/Spark集群：
+
+<ul>
+<li>3 node, 48 core &amp; 48G mem total, 12 core max &amp; 4G mem per node for each client</li>
+</ul>
+</li>
+</ul>
+
+
+<h4>测试结果：</h4>
+
+<p>  测试结果对比如下：</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Hive/Shark  </th>
+<th>real time </th>
+<th>user time  </th>
+<th>sys time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>Hive:       </td>
+<td>23m2.292s </td>
+<td>0m33.430s  </td>
+<td>0m3.014s</td>
+</tr>
+<tr>
+<td></td>
+<td>Shark:      </td>
+<td>1m42.698s </td>
+<td>0m30.694s  </td>
+<td>0m3.193s</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>测试结果解读：</h4>
+
+<ul>
+<li><p>SQL 兼容性：shark完全兼容hive的语法，hive能够执行的语法，shark能够无缝的执行，因此迁移成本为零</p></li>
+<li><p>性能：不言而喻，Shark在集群资源只有三个节点而MR有39的节点下，仍然能够比Hive执行效率高出近13倍</p></li>
+<li><p>原因分析：本次测试，数据量并不算大，所以对于MR和Spark而言，读取文件的IO开销几乎无异。造成执行时间差异如此大的原因在于MR与Spark计算框架的开销。</p></li>
+</ul>
+
+
+<p>  从测试结果看，user time两者的耗时几乎相等，原因是shark和hive在客户端做的事情几乎一致（主要是compile阶段将SQL转化成QueryPlan）。
+  而real time主要耗时在等待集群计算结果上，从计算框架的调度角度来看，MR框架的调度很重，通过heatbeat来分配MapSlot和ReduceSlot，而Spark的Actor模型，比较轻量级；从计算模型来看，MR的Map-Shuffle-Reduce绝大部分的开销在于中间结果的persistence上，IO开销很重，而Spark通过RDD transformation和action操作，并且可以充分利用内存，IO的开销比MR要轻的多</p>
+
+<h4>测试中遇到的问题：</h4>
+
+<p>  在执行join时，偶尔会遇到ArrayIndexOutOfBoundsException的错误，原因是我们的shark采用了Dianping自有的cosmos-hadoop-0.9.0版本（基于apache官方0.9.0版本打过自己的patch），而官方版本有concurrency的问题。在amplab的版本中已经修复过。
+  后续将amplab的concurrency的commit梳理，引入到我们的版本来。</p>
 </div>
 
 
@@ -116,7 +192,7 @@
   
 
 
-<time datetime="2013-07-16T17:27:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
+<time datetime="2013-07-23T13:42:00+08:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2013</time>
       
 
 
@@ -124,7 +200,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-examples/" data-via="" data-counturl="http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-examples/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://zhuguangbin.github.io/blog/2013/07/23/shark-vs-hive-benchmark-test/" data-via="" data-counturl="http://zhuguangbin.github.io/blog/2013/07/23/shark-vs-hive-benchmark-test/" >Tweet</a>
   
   
   
@@ -133,10 +209,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/07/16/spark-programming-user-guide-for-javauser/" title="Previous Post: Spark Programming User Guide For Java User">&laquo; Spark Programming User Guide For Java User</a>
+        <a class="basic-alignment left" href="/blog/2013/07/21/shark-deploy/" title="Previous Post: Shark安装部署与应用">&laquo; Shark安装部署与应用</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2013/07/21/shark-deploy/" title="Next Post: Shark安装部署与应用">Shark安装部署与应用 &raquo;</a>
       
     </p>
   </footer>
