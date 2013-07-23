@@ -10,6 +10,8 @@ categories:
 
   上一节简单介绍了如何搭建Spark的本地开发环境，并示例了一个SparkHelloWorld project。本节详细介绍Spark的Scala API，并介绍Spark编程的高级特性。
   
+<!--more-->
+
   Spark程序其实是一个包含main函数的driver程序，它通知集群对RDD进行一系列的并行操作。RDD是Spark的核心，它分片分布在集群的各个节点上，以便进行并行操作。RDD通过hdfs或其他hadoop支持的文件系统创建，或者从其他已存在的RDD转换而来。用户可以对RDD进行一些列的动作操作，比如count，reduce等。也可以转变RDD的存储状态，比如，cache将RDD缓存在内存中，save将RDD保存到文件系统。RDD自身是fault-tolerant，当节点宕机时通过血统来recovery。
   
   Spark编程的主要工作其实就是创建RDD，转换RDD，对RDD进行相应的动作。同时Spark提供了另外一个抽象：共享变量。用户的driver程序可以将方法中定义的变量分发给Spark集群各个节点以便与driver共享并进行并行操作。目前有两种实现：broadcast variables（将数据cache在集群的各个节点的内存中，实现类似于MapReduce中DistributedCache的功能来加快数据访问）和accumulators（只实现了一个added方法，用以实现计数器功能）

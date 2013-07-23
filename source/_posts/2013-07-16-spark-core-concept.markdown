@@ -9,6 +9,8 @@ categories:
 
 Spark的核心思想是RDD，以及对RDD的操作（transformation/action）。本篇简单介绍这些基本概念，以有利于理解Spark的原理。
 
+<!--more-->
+
 ###(一) RDD(resilient distributed dataset)
 
 1. ** RDD的基本概念**  

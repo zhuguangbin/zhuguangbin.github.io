@@ -15,7 +15,10 @@ categories:
   4. Streaming Job：如实时推荐，采用Storm或者Spark-Streaming。
   
   本篇首先介绍Shark的安装部署配置，然后介绍我们在将Shark集成到我们的Hadoop集群中遇到的一些坑和我们的解决方案。
-  
+
+<!--more-->
+
+ 
 ### 版本选择
 
   * Hadoop: 1.0.3

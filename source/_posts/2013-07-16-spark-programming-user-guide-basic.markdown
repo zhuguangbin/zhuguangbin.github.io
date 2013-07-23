@@ -12,6 +12,8 @@ categories:
   
   另一种方式是在自己的project中引用spark的包，开发standalone的Spark Job。用户可以选择自己喜欢的构建工具（sbt/maven etc），构建一个Scala Project，只需要引入spark的包即可。推荐采用sbt构建项目，用eclipse的scala-ide进行开发。下节简单介绍一个简单的SparkHelloWorld项目的构建和开发步骤。
 
+<!--more-->
+
 ### 创建第一个SparkHelloWorld Project
 
   1. 安装sbt： 请参考[这里](http://www.scala-sbt.org/release/docs/Getting-Started/Setup.html)安装sbt，不在此赘述

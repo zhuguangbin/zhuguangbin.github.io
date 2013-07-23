@@ -6,7 +6,9 @@ comments: true
 categories: 
 ---
 
-为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。
+为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比，测试性能非常满意，虽然没有达到官方宣称的100倍，但至少10倍的性能提升。
+
+<!--more-->
 
 ####测试工具与方法：
 

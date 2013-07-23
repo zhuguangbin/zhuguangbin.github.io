@@ -8,6 +8,9 @@ categories:
 
 [Spark](http://spark-project.org/)是UC Berkeley大学[AMPLAB](https://amplab.cs.berkeley.edu/)开源的分布式处理框架。目前已贡献给Apache社区，成为[inbubator项目](http://wiki.apache.org/incubator/SparkProposal)。
 
+<!--more-->
+
+
 关于Spark这种分布式处理框架的定位可参考apache的wiki，如下：
 > Spark is an open source system for **fast and flexible large-scale data analysis**. Spark provides a general purpose runtime that supports low-latency execution in several forms. These include **interactive exploration of very large datasets**, **near real-time stream processing**, and **ad-hoc SQL analytics** (through higher layer extensions). Spark interfaces with HDFS, HBase, Cassandra and several other storage storage layers, and **exposes APIs in Scala, Java and Python**. Background Spark started as U.C. Berkeley research project, designed to efficiently run machine learning algorithms on large datasets. Over time, it has evolved into a general computing engine as outlined above. Spark’s developer community has also grown to include additional institutions, such as universities, research labs, and corporations. Funding has been provided by various institutions including the U.S. National Science Foundation, DARPA, and a number of industry sponsors. See: https://amplab.cs.berkeley.edu/sponsors/ for full details.
 

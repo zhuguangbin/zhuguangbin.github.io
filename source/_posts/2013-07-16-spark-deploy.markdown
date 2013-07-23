@@ -15,6 +15,9 @@ categories:
 
 本章主要介绍本地模式和standalone模式的安装部署配置。
 
+<!--more-->
+
+
 ###本地模式
   *注: 本文只介绍Linux的安装部署配置方式，Windows以及Mac下类似，用户请自行参考官方文档*
 

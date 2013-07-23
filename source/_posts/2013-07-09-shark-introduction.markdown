@@ -11,6 +11,8 @@ categories:
 
 > Shark is a large-scale data warehouse system for Spark designed to be compatible with Apache Hive. It can answer Hive QL queries up to 100 times faster than Hive without modification to the existing data nor queries. Shark supports Hive's query language, metastore, serialization formats, and user-defined functions.
 
+<!--more-->
+
 简要总结下Shark的特性[2]：
 
 * builds on Spark
