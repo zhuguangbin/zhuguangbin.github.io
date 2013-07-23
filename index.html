@@ -9,7 +9,7 @@
   <meta name="author" content="Zhu Guangbin">
 
   
-  <meta name="description" content="为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。 测试工具与方法： 之前写过一个benchmark sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试； 测试方法就是分别利用Hive和Shark的CliDriver: * time &hellip;">
+  <meta name="description" content="为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比，测试性能非常满意，虽然没有达到官方宣称的100倍，但至少10倍的性能提升。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,95 +91,21 @@
 
 <time datetime="2013-07-23T13:42:00+08:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2013</time>
         
+         | <a href="/blog/2013/07/23/shark-vs-hive-benchmark-test/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。</p>
+  <div class="entry-content"><p>为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比，测试性能非常满意，虽然没有达到官方宣称的100倍，但至少10倍的性能提升。</p>
 
-<h4>测试工具与方法：</h4>
-
-<p>  之前写过一个<a href="/images/benchmark.hql">benchmark sql</a>，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试；
-  测试方法就是分别利用Hive和Shark的CliDriver:</p>
-
-<pre><code>* time hive -f hql_benchmark.sql &gt; hive_test_result 2&gt;&amp;1
-* time shark-witherror -f hql_benchmark.sql &gt; shark_test_result 2&gt;&amp;1    
-</code></pre>
-
-<h4>集群资源情况：</h4>
-
-<ul>
-<li>Hive/MapReduce集群：
-
-<ul>
-<li>37 Node, 436 MapSlot &amp; 436 ReduceSlot total, 1 slot per task</li>
-</ul>
-</li>
-<li>Shark/Spark集群：
-
-<ul>
-<li>3 node, 48 core &amp; 48G mem total, 12 core max &amp; 4G mem per node for each client</li>
-</ul>
-</li>
-</ul>
-
-
-<h4>测试结果：</h4>
-
-<p>  测试结果对比如下：</p>
-
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Hive/Shark  </th>
-<th>real time  </th>
-<th>user time   </th>
-<th>sys time</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-<td>Hive:       </td>
-<td><em>23m2.292s</em></td>
-<td>0m33.430s   </td>
-<td>0m3.014s</td>
-</tr>
-<tr>
-<td></td>
-<td>Shark:      </td>
-<td><em>1m42.698s</em></td>
-<td>0m30.694s   </td>
-<td>0m3.193s</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>  详细结果结果请看：
- <a href="/images/hive_test_result">hive_test_result</a>
- <a href="/images/shark_test_result">shark_test_result</a></p>
-
-<h4>测试结果解读：</h4>
-
-<ul>
-<li><p>SQL 兼容性：shark完全兼容hive的语法，hive能够执行的语法，shark能够无缝的执行，因此迁移成本为零</p></li>
-<li><p>性能：不言而喻，Shark在集群资源只有三个节点而MR有39的节点下，仍然能够比Hive执行效率高出近13倍</p></li>
-<li><p>原因分析：本次测试，数据量并不算大，所以对于MR和Spark而言，读取文件的IO开销几乎无异。造成执行时间差异如此大的原因在于MR与Spark计算框架的开销。</p></li>
-</ul>
-
-
-<p>  从测试结果看，user time两者的耗时几乎相等，原因是shark和hive在客户端做的事情几乎一致（主要是compile阶段将SQL转化成QueryPlan）。
-  而real time主要耗时在等待集群计算结果上，从计算框架的调度角度来看，MR框架的调度很重，通过heatbeat来分配MapSlot和ReduceSlot，而Spark的Actor模型，比较轻量级；从计算模型来看，MR的Map-Shuffle-Reduce绝大部分的开销在于中间结果的persistence上，IO开销很重，而Spark通过RDD transformation和action操作，并且可以充分利用内存，IO的开销比MR要轻的多</p>
-
-<h4>测试中遇到的问题：</h4>
-
-<p>  在执行join时，偶尔会遇到ArrayIndexOutOfBoundsException的错误，原因是我们的shark采用了Dianping自有的cosmos-hadoop-0.9.0版本（基于apache官方0.9.0版本打过自己的patch），而官方版本有concurrency的问题。在amplab的版本中已经修复过。
-  后续将amplab的concurrency的commit梳理，引入到我们的版本来。</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/23/shark-vs-hive-benchmark-test/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -208,6 +134,8 @@
 
 <time datetime="2013-07-21T23:07:00+08:00" pubdate data-updated="true">Jul 21<span>st</span>, 2013</time>
         
+         | <a href="/blog/2013/07/21/shark-deploy/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -226,242 +154,12 @@
 
 <p>  本篇首先介绍Shark的安装部署配置，然后介绍我们在将Shark集成到我们的Hadoop集群中遇到的一些坑和我们的解决方案。</p>
 
-<h3>版本选择</h3>
-
-<ul>
-<li>Hadoop: 1.0.3</li>
-<li>Hive: 0.9.0 amp-patched version</li>
-<li>Spark: 0.7.3</li>
-<li>Shark: 0.7.0</li>
-</ul>
-
-
-<blockquote><p>Note: Shark 0.7.0依赖的Hive版本是amplab自己基于apache官方0.9.0版本打过自己的patch的<a href="https://github.com/amplab/hive/tree/amp-0.9-20130517">版本</a>，而我们自己的<a href="https://github.com/dianping/hive/tree/cosmos-hadoop-0.9.0">cosmos-hadoop-0.9.0版本</a>也是基于apache官方0.9.0修复而来。将amp的版本与我们的版本compare了一下(github的<a href="https://github.com/amplab/hive/compare/dianping:cosmos-hadoop-0.9.0...amp-0.9-20130517">compare url</a>)，发现amplab的版本与我们的版本的主要区别在于我们的HiveServer是支持Security的，而amplab的不支持。所以Shark v0.7.0的Hive Server不支持Security。
-我们后续会将Shark对Hive的依赖迁移到我们的cosmos-hadoop-0.9.0版本。</p></blockquote>
-
-<h3>前提条件</h3>
-
-<ol>
-<li> 集群部署并配置好Hadoop和Spark</li>
-<li> 安装部署并配置好Hive</li>
-</ol>
-
-
-<h3>安装配置</h3>
-
-<p>  Shark的安装配置很简单，只需要下载安装包解压并进行简单的配置即可。<em>Note：注意hive的依赖</em></p>
-
-<ol>
-<li><p>download Shark和amp-patched hive的压缩包，并解压</p>
-
-<pre><code> cd /usr/local/spark
- wget http://spark-project.org/download-hive-0.9.0-bin.tar.tz
- tar zxvf download-hive-0.9.0-bin.tar.tz
- wget http://spark-project.org/download/shark-0.7.0-hadoop1-bin.tgz
- tar zxvf shark-0.7.0-hadoop1-bin.tgz
- ln -s shark-0.7.0 shark-release
-
- ls -l
- 总用量 82924
- drwxr-xr-x  7 hadoop hadoop     4096 7月  20 16:42 hive-0.9.0-bin
- -rw-r--r--  1 hadoop hadoop 22711471 10月 15 2012 hive-0.9.0-bin.tar.gz
- drwxr-xr-x 11 hadoop hadoop     4096 7月   3 17:53 shark-0.7.0
- lrwxrwxrwx  1 hadoop hadoop       11 7月  14 16:02 shark-release -&gt; shark-0.7.0
- drwxr-xr-x 18 hadoop hadoop     4096 7月  20 17:09 spark-0.7.3
- -rw-r--r--  1 hadoop hadoop 62187714 7月  17 05:29 spark-0.7.3-prebuilt-hadoop1.tgz
- lrwxrwxrwx  1 hadoop hadoop       11 7月  20 16:49 spark-release -&gt; spark-0.7.3
-</code></pre></li>
-<li><p>配置Shark:</p>
-
-<ul>
-<li><p>添加环境变量，如下：</p>
-
-<pre><code>  vim /etc/profile
-  export SHARK_HOME=/usr/local/spark/shark-release
-  export PATH=$SHARK_HOME/bin:$PATH
-</code></pre></li>
-<li><p>配置Shark：Shark的配置文件只有一个:$SHARK_HOME/conf/shark-env.sh</p>
-
-<pre><code>  export SPARK_MEM=4g
-
-   # (Required) Set the master program's memory
-  export SHARK_MASTER_MEM=1g
-
-   # (Required) Point to your Scala installation.
-  export SCALA_HOME=/usr/local/scala/
-
-   # (Required) Point to the patched Hive binary distribution
-  export HIVE_HOME=/usr/local/spark/hive-0.9.0-bin
-
-   # (Optional) Specify the location of Hive's configuration directory. By default,
-   # it points to $HIVE_HOME/conf
-  export HIVE_CONF_DIR="$HIVE_HOME/conf"
-
-   # For running Shark in distributed mode, set the following:
-  export HADOOP_HOME=/usr/local/hadoop/hadoop-release/
-  export SPARK_HOME=/usr/local/spark/spark-release/
-  export MASTER=spark://10.2.6.152:7077
-
-  source $SPARK_HOME/conf/spark-env.sh
-
-   # LZO compression native lib
-  export LD_LIBRARY_PATH=/usr/local/hadoop/lzo/lib
-
-   # (Optional) Extra classpath
-  export SPARK_LIBRARY_PATH=/usr/local/hadoop/hadoop-release/lib/native/Linux-amd64-64
-
-   # Java options
-   # On EC2, change the local.dir to /mnt/tmp
-  SPARK_JAVA_OPTS="-Dspark.local.dir=/tmp "
-  SPARK_JAVA_OPTS+="-Dspark.kryoserializer.buffer.mb=10 "
-   #SPARK_JAVA_OPTS+="-verbose:gc -XX:-PrintGCDetails -XX:+PrintGCTimeStamps "
-  SPARK_JAVA_OPTS+="-XX:MaxPermSize=256m "
-  SPARK_JAVA_OPTS+="-Dspark.cores.max=12 "
-  export SPARK_JAVA_OPTS
-</code></pre></li>
-</ul>
-</li>
-<li><p>将Shark以及Hive的安装配置分发到Spark集群的各个节点</p>
-
-<blockquote><p>NOTE：Shark只是一个Client Driver将SQL转化成Spark Job，为什么需要将Shark和Hive的包分发到各个节点呢？其实这样做的目的是将Shark和Hive的jar包加载到Spark StandaloneBackEnd的CLASSPATH里，让Executor启动时加载Shark和Hive的jar包。我尝试不分发Shark和Hive的包，而只将Hive的jar包放到Spark的lib目录下，同样work，否则会包ClassNotFound错误。为了更加方便的管理，还是将Spark和Hive的包分发到各个节点上。</p></blockquote></li>
-<li><p>将客户端的Hive换为我们版本的Hive，修改shark-env.sh，将HIVE_HOME只向我们版本的Hive</p>
-
-<pre><code> export HIVE_HOME=/usr/local/hadoop/hive-release
-</code></pre>
-
-<blockquote><p>NOTE: 为什么这样做？因为Shark也只是个客户端而已，我们版本的Hive添加了我们自己的一些特性，如比权限验证，我们不允许用户有grant权限，不允许用户set一些重要的HiveConf。而这些是amp的hive没有的。因此，客户端指向我们自己的Hive，而各个节点用amplab的版本就可以。</p></blockquote></li>
-<li><p>测试验证：</p>
-
-<pre><code> [hadoop@cosmos155 conf]$ shark
-
- Starting the Shark Command Line Client
- WARNING: org.apache.hadoop.metrics.jvm.EventCounter is deprecated. Please use org.apache.hadoop.log.metrics.EventCounter in all the log4j.properties files.
- Logging initialized using configuration in jar:file:/usr/local/hadoop/hive-0.9.0/lib/hive-common-0.9.0.jar!/hive-log4j.properties
- Hive history file=/data/hive-query-log/hadoop/hive_job_log_hadoop_201307221453_1130459904.txt
- shark (default)&gt; show tables;
- OK
- device_permanent_city
- dpmid_dp_shop_his_2012
- dpmid_tg_receipt_add
- dpods_mc_table_info
- hippolog
- hippolog_input_nosort
- hippolog_input_sort
- hippologcurrent
- jinss_test_1129
- lzo_rcfile_test
- nginx
- nginx_bak
- nginx_search_condition
- nginx_temp
- nginxlogcurrent
- nginxlogcurrenttmp
- range_keys
- rcfilenginx_gz
- search_log
- searchexec
- test
- Time taken: 3.03 seconds
- shark&gt; 
-</code></pre></li>
-</ol>
-
-
-<h3>我们遇到的一些坑</h3>
-
-<ol>
-<li><p>Security问题：</p>
-
-<ul>
-<li><p>描述：由于我们的Hadoop集群启用了kerberos认证，而Spark目前是不支持Kerberos的，所以，访问HDFS时报如下错误：</p>
-
-<pre><code>  javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]  
-</code></pre></li>
-<li><p>解决方案：为每一个Spark节点创建一个principal: shark/_HOST@DIANPING.COM，并生成keytab。将shark加入所有组，使其有所有表的读权限。然后，起一个crontab定时执行kinit去KDC拿一张票，保证Spark在向HDFS读取文件时有shark的ticket cache。</p></li>
-</ul>
-</li>
-<li><p>文件权限问题：</p>
-
-<ul>
-<li>描述：基于上一个问题的解决方案，这样客户端提交SQL的用户principal是用户自己，如guangbin.zhu，其为本次Job创建了一个scrachdir(/tmp/hive-guangbin.zhu/{jobname})，owner是guangbin.zhu，group是guangbin.zhu的group:op。但发到Spark集群真正执行处理的principal是shark，这样就导致shark用户无权访问guangbin.zhu的scrachdir而报错。</li>
-<li>解决方案：在shark启动时，set dfs.umaskmode=000，在Spark集群的hive-site.xml中也添加dfs.umaskmode=000配置。这样强制将本次Shark Job的hdfs的权限设为每个人都有权限读写。</li>
-</ul>
-</li>
-<li><p>并发问题：</p>
-
-<ul>
-<li>描述：目前Spark Standalone模式只支持FIFO调度，默认每个Job会占有所有的集群资源，而后续的Job会一直等待直到它退出。这将影响集群多用户的使用，当一个用户执行shark时，其他人只能等待他执行完。</li>
-<li><p>解决方案：通过查看文档，Spark支持用户配置其使用的cpu core数，通过以下配置，限定每个shark job的资源占用：</p>
-
-<pre><code>  #每个Spark Job的Worker Executor使用4G内存
-  export SPARK_MEM=4g
-  #每个Spark Job最大占用12个CPU core
-  SPARK_JAVA_OPTS+="-Dspark.cores.max=12 "
-</code></pre></li>
-</ul>
-</li>
-<li><p>权限问题：</p>
-
-<ul>
-<li>描述：我们的Hive启用了authorization，而shark v0.7.0中没有authorization，即所有人对所有表拥有所有权限，这不符合我们的需求。</li>
-<li>解决方案：修改代码，修复bug，见<a href="https://github.com/zhuguangbin/shark/commit/93aa994db81512d4bfe6bee6a94cc198f6970fde">github commit</a></li>
-</ul>
-</li>
-</ol>
-
-
-<blockquote><p>Note: 在build Shark时，一定要选择amplab patched的HIVE_HOME，否则build出来的shark的SharkSemanticAnalyzer会有问题。我们后续将对Hive的依赖迁移到我们的Hive版本。</p></blockquote>
-
-<ol>
-<li><p>ArrayIndexOutOfBoundsException:</p>
-
-<ul>
-<li><p>描述：在偶尔情况下，会产生如下错误：</p>
-
-<pre><code>  13/07/23 11:14:07 WARN lazybinary.LazyBinaryStruct: Extra bytes detected at the end of the row! Ignoring similar problems.
-  13/07/23 11:14:07 ERROR executor.Executor: Exception in task ID 50
-  java.lang.ArrayIndexOutOfBoundsException
-      at java.lang.System.arraycopy(Native Method)
-      at org.apache.hadoop.io.Text.set(Text.java:205)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
-      at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
-      at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
-      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
-      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
-      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
-      at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
-      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
-      at scala.collection.Iterator$class.foreach(Iterator.scala:772)
-      at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
-      at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
-      at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
-      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
-      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
-      at spark.scheduler.ResultTask.run(ResultTask.scala:77)
-      at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
-      at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
-      at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
-      at java.lang.Thread.run(Thread.java:662)
-</code></pre></li>
-<li><p>原因：apache 官方hive的版本存在concurrency问题。感谢Intel的<a href="http://weibo.com/u/2122584747">jerryshao</a>的建议。sharkuser的google group上有人讨论这个问题，见这个<a href="https://groups.google.com/forum/#!searchin/shark-users/java.lang.ArrayIndexOutOfBoundsException/shark-users/QcrcV5BPPek/Bue9Cp2Zk5wJ">topic</a></p></li>
-<li>解决方案：采用amplab的hive版本，修复掉了concurrency问题。后续，我们将梳理amplab的hive版本与我们自己版本的差异，让shark依赖我们自有版本的hive而不是amplab的版本。</li>
-</ul>
-</li>
-</ol>
-
-
-<h3>参考资料</h3>
-
-<ol>
-<li><a href="https://github.com/amplab/shark">shark on github</a></li>
-<li><a href="https://github.com/amplab/shark/wiki">shark 官方wiki</a></li>
-<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2013/02/Shark-SQL-and-Rich-Analytics-at-Scala-Reynold-Xin.pdf">shark introductin slide</a></li>
-</ol>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/21/shark-deploy/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -489,6 +187,8 @@
 
 
 <time datetime="2013-07-16T17:27:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/07/16/spark-programming-examples/#disqus_thread">Comments</a>
         
       </p>
     
@@ -526,6 +226,8 @@
 
 <time datetime="2013-07-16T16:47:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
         
+         | <a href="/blog/2013/07/16/spark-programming-user-guide-for-javauser/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -562,6 +264,8 @@
 
 <time datetime="2013-07-16T16:37:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
         
+         | <a href="/blog/2013/07/16/spark-programming-user-guide-for-scalauser/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -571,304 +275,12 @@
 
 <p>  上一节简单介绍了如何搭建Spark的本地开发环境，并示例了一个SparkHelloWorld project。本节详细介绍Spark的Scala API，并介绍Spark编程的高级特性。</p>
 
-<p>  Spark程序其实是一个包含main函数的driver程序，它通知集群对RDD进行一系列的并行操作。RDD是Spark的核心，它分片分布在集群的各个节点上，以便进行并行操作。RDD通过hdfs或其他hadoop支持的文件系统创建，或者从其他已存在的RDD转换而来。用户可以对RDD进行一些列的动作操作，比如count，reduce等。也可以转变RDD的存储状态，比如，cache将RDD缓存在内存中，save将RDD保存到文件系统。RDD自身是fault-tolerant，当节点宕机时通过血统来recovery。</p>
-
-<p>  Spark编程的主要工作其实就是创建RDD，转换RDD，对RDD进行相应的动作。同时Spark提供了另外一个抽象：共享变量。用户的driver程序可以将方法中定义的变量分发给Spark集群各个节点以便与driver共享并进行并行操作。目前有两种实现：broadcast variables（将数据cache在集群的各个节点的内存中，实现类似于MapReduce中DistributedCache的功能来加快数据访问）和accumulators（只实现了一个added方法，用以实现计数器功能）</p>
-
-<p>  下面我们进行详细介绍，并给出一些例子。一个典型的Spark用户程序的主要包含以下步骤：</p>
-
-<ol>
-<li> 初始化SparkContext</li>
-<li> 创建RDD</li>
-<li> 对RDD进行一系列Operation</li>
-<li> 利用共享变量实现某些高级特性</li>
-</ol>
-
-
-<h3>初始化SparkContext</h3>
-
-<ol>
-<li> 将spark-core以及其依赖的jar包加入CLASSPATH（可以通过sbt或者maven）。详见上节介绍，在此不赘述。</li>
-<li><p> import Spark相关的class或变量。在driver的用户程序中加入以下代码：</p>
-
-<pre><code>import spark.SparkContext
-import spark.SparkContext._
-</code></pre></li>
-<li><p> 创建SparkContext对象</p>
-
-<pre><code>val sc = new SparkContext(master, appName, [sparkHome], [jars])
-</code></pre></li>
-</ol>
-
-
-<p>  第一个参数指定Spark集群的Master URL，可以为以下几种：</p>
-
-<table>
-<thead>
-<tr>
-<th>  </th>
-<th> Master URL        </th>
-<th align="center"> 含义                                                                       </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>  </td>
-<td>local          </td>
-<td align="center">采用一个worker线程本地运行                                                   |</td>
-</tr>
-<tr>
-<td>  </td>
-<td>local[K]       </td>
-<td align="center">采用K个线程本地运行                                                          |</td>
-</tr>
-<tr>
-<td>  </td>
-<td>spark://HOST:PORT  </td>
-<td align="center">连接到Spark Standalone集群的Master，HOST是Master的IP或hostname，端口默认7077  |</td>
-</tr>
-<tr>
-<td>  </td>
-<td>mesos://HOST:PORT  </td>
-<td align="center">连接到Mesos集群，HOST是Mesos master的IP或hostname，端口默认5050               |</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>  第二个参数指定该App程序的名字
-  第三个参数和第四个参数，当该App需要跑在集群模式下时必须指定。sparkHome指定在worker节点上Spark的安装路径；jars指定当前App程序所依赖的jar包的列表。可以通过sbt-assembly将该App与其依赖jar包打成一个jar。</p>
-
-<blockquote><p>Note： spark-shell启动的时候已经初始化好SparkContext叫做sc，可以直接使用。用户可以通过系统变量来自定义sc，如以下例子利用本地的4个core运行，将code.jar加入CLASSPATH：</p></blockquote>
-
-<pre><code>    $ MASTER=local[4] ADD_JARS=code.jar ./spark-shell
-</code></pre>
-
-<h3>创建RDD</h3>
-
-<p>  有两种方式创建RDD：</p>
-
-<ul>
-<li><p>将已存在的Scala Collection Object parallelized化:这样这个Scala Collection的元素就会copy形成一个RDD就可以对它进行并行操作，例如下例对Array进行并行化：</p>
-
-<pre><code>val data = Array(1, 2, 3, 4, 5)
-val distData = sc.parallelize(data)
-</code></pre>
-
-<blockquote><p>Note：默认Spark会根据集群情况自动分片，用户可以通过指定第二个参数来手工分片，如将data手工分为10片：</p></blockquote>
-
-<pre><code>  val distData = sc.parallelize(data,10)
-</code></pre>
-
-<ul>
-<li><p>从Hadoop创建: Spark可以从Hadoop支持的文件系统或其他存储系统（本地文件系统，HDFS，KFS，S3，HBase，etc）读取文件创建RDD。Spark支持TextFile, SequenceFile以及其他所有InputFormat。</p>
-
-<pre><code>sc.textFile("file.txt") 
-sc.textFile("directory/*.txt")  
-sc.textFile("hdfs://namenode:port/path/textfile")
-
-sc.sequenceFile("hdfs://namenode:port/path/sequencefile",Int,String)
-sc.hadoopRDD(conf, inputFormatClass, keyClass, valueClass) 
-</code></pre></li>
-</ul>
-
-
-<blockquote><p>Note: 以上方法最后一个参数可以调节文件的分片数。默认为一个block一个slice，用户可以上调这个参数来获得更大的slice size。</p></blockquote></li>
-</ul>
-
-
-<h3>RDD Operations</h3>
-
-<p>  RDD支持两类Operation：transformation（对以存在的RDD进行转换生成另一个RDD）和action（对RDD进行聚集操作）</p>
-
-<ul>
-<li><p>Transformation：</p>
-
-<p>Spark支持的transformation如下表：
-<table class="table" border="1">
-<tbody><tr><th style="width:25%">Transformation</th><th>Meaning</th></tr>
-<tr>
-<td> <b>map</b>(<i>func</i>) </td>
-<td> Return a new distributed dataset formed by passing each element of the source through a function <i>func</i>. </td>
-</tr>
-<tr>
-<td> <b>filter</b>(<i>func</i>) </td>
-<td> Return a new dataset formed by selecting those elements of the source on which <i>func</i> returns true. </td>
-</tr>
-<tr>
-<td> <b>flatMap</b>(<i>func</i>) </td>
-<td> Similar to map, but each input item can be mapped to 0 or more output items (so <i>func</i> should return a Seq rather than a single item). </td>
-</tr>
-<tr>
-<td> <b>mapPartitions</b>(<i>func</i>) </td>
-<td> Similar to map, but runs separately on each partition (block) of the RDD, so <i>func</i> must be of type
-Iterator[T] =&gt; Iterator[U] when running on an RDD of type T. </td>
-</tr>
-<tr>
-<td> <b>mapPartitionsWithSplit</b>(<i>func</i>) </td>
-<td> Similar to mapPartitions, but also provides <i>func</i> with an integer value representing the index of
-the split, so <i>func</i> must be of type (Int, Iterator[T]) =&gt; Iterator[U] when running on an RDD of type T.
-</td>
-</tr>
-<tr>
-<td> <b>sample</b>(<i>withReplacement</i>, <i>fraction</i>, <i>seed</i>) </td>
-<td> Sample a fraction <i>fraction</i> of the data, with or without replacement, using a given random number generator seed. </td>
-</tr>
-<tr>
-<td> <b>union</b>(<i>otherDataset</i>) </td>
-<td> Return a new dataset that contains the union of the elements in the source dataset and the argument. </td>
-</tr>
-<tr>
-<td> <b>distinct</b>([<i>numTasks</i>])) </td>
-<td> Return a new dataset that contains the distinct elements of the source dataset.</td>
-</tr>
-<tr>
-<td> <b>groupByKey</b>([<i>numTasks</i>]) </td>
-<td> When called on a dataset of (K, V) pairs, returns a dataset of (K, Seq[V]) pairs. <br>
-<b>Note:</b> By default, this uses only 8 parallel tasks to do the grouping. You can pass an optional <code>numTasks</code> argument to set a different number of tasks.
-</td>
-</tr>
-<tr>
-<td> <b>reduceByKey</b>(<i>func</i>, [<i>numTasks</i>]) </td>
-<td> When called on a dataset of (K, V) pairs, returns a dataset of (K, V) pairs where the values for each key are aggregated using the given reduce function. Like in <code>groupByKey</code>, the number of reduce tasks is configurable through an optional second argument. </td>
-</tr>
-<tr>
-<td> <b>sortByKey</b>([<i>ascending</i>], [<i>numTasks</i>]) </td>
-<td> When called on a dataset of (K, V) pairs where K implements Ordered, returns a dataset of (K, V) pairs sorted by keys in ascending or descending order, as specified in the boolean <code>ascending</code> argument.</td>
-</tr>
-<tr>
-<td> <b>join</b>(<i>otherDataset</i>, [<i>numTasks</i>]) </td>
-<td> When called on datasets of type (K, V) and (K, W), returns a dataset of (K, (V, W)) pairs with all pairs of elements for each key. </td>
-</tr>
-<tr>
-<td> <b>cogroup</b>(<i>otherDataset</i>, [<i>numTasks</i>]) </td>
-<td> When called on datasets of type (K, V) and (K, W), returns a dataset of (K, Seq[V], Seq[W]) tuples. This operation is also called <code>groupWith</code>. </td>
-</tr>
-<tr>
-<td> <b>cartesian</b>(<i>otherDataset</i>) </td>
-<td> When called on datasets of types T and U, returns a dataset of (T, U) pairs (all pairs of elements). </td>
-</tr>
-</tbody></table></p></li>
-<li><p>Actions：</p>
-
-<p>Spark支持的action类型如下表：
-<table class="table" border="1">
-<tbody><tr><th>Action</th><th>Meaning</th></tr>
-<tr>
-<td> <b>reduce</b>(<i>func</i>) </td>
-<td> Aggregate the elements of the dataset using a function <i>func</i> (which takes two arguments and returns one). The function should be commutative and associative so that it can be computed correctly in parallel. </td>
-</tr>
-<tr>
-<td> <b>collect</b>() </td>
-<td> Return all the elements of the dataset as an array at the driver program. This is usually useful after a filter or other operation that returns a sufficiently small subset of the data. </td>
-</tr>
-<tr>
-<td> <b>count</b>() </td>
-<td> Return the number of elements in the dataset. </td>
-</tr>
-<tr>
-<td> <b>first</b>() </td>
-<td> Return the first element of the dataset (similar to take(1)). </td>
-</tr>
-<tr>
-<td> <b>take</b>(<i>n</i>) </td>
-<td> Return an array with the first <i>n</i> elements of the dataset. Note that this is currently not executed in parallel. Instead, the driver program computes all the elements. </td>
-</tr>
-<tr>
-<td> <b>takeSample</b>(<i>withReplacement</i>, <i>num</i>, <i>seed</i>) </td>
-<td> Return an array with a random sample of <i>num</i> elements of the dataset, with or without replacement, using the given random number generator seed. </td>
-</tr>
-<tr>
-<td> <b>saveAsTextFile</b>(<i>path</i>) </td>
-<td> Write the elements of the dataset as a text file (or set of text files) in a given directory in the local filesystem, HDFS or any other Hadoop-supported file system. Spark will call toString on each element to convert it to a line of text in the file. </td>
-</tr>
-<tr>
-<td> <b>saveAsSequenceFile</b>(<i>path</i>) </td>
-<td> Write the elements of the dataset as a Hadoop SequenceFile in a given path in the local filesystem, HDFS or any other Hadoop-supported file system. This is only available on RDDs of key-value pairs that either implement Hadoop&rsquo;s Writable interface or are implicitly convertible to Writable (Spark includes conversions for basic types like Int, Double, String, etc). </td>
-</tr>
-<tr>
-<td> <b>countByKey</b>() </td>
-<td> Only available on RDDs of type (K, V). Returns a <code>Map</code> of (K, Int) pairs with the count of each key. </td>
-</tr>
-<tr>
-<td> <b>foreach</b>(<i>func</i>) </td>
-<td> Run a function <i>func</i> on each element of the dataset. This is usually done for side effects such as updating an accumulator variable (see below) or interacting with external storage systems. </td>
-</tr>
-</tbody></table></p></li>
-<li><p>Persist or Cache</p>
-
-<p>RDD可以通过persist()或者cache()方法缓存在内存中，以便后续操作重用来使得查询更快。这是Spark更好的支持interative算法和interactive Job的关键所在。</p>
-
-<p>persist方法可以传入一个参数供用户自定义存储级别，默认为MEMORY_ONLY，即存储在内存中。cache()方法是将RDD缓存在内存中的便捷方法。Spark支持的存储级别如下表：</p>
-
-<p><table class="table" border="1">
-<tbody><tr><th style="width:23%">Storage Level</th><th>Meaning</th></tr>
-<tr>
-<td> MEMORY_ONLY </td>
-<td> Store RDD as deserialized Java objects in the JVM. If the RDD does not fit in memory, some partitions will
-not be cached and will be recomputed on the fly each time they&rsquo;re needed. This is the default level. </td>
-</tr>
-<tr>
-<td> MEMORY_AND_DISK </td>
-<td> Store RDD as deserialized Java objects in the JVM. If the RDD does not fit in memory, store the
-partitions that don&rsquo;t fit on disk, and read them from there when they&rsquo;re needed. </td>
-</tr>
-<tr>
-<td> MEMORY_ONLY_SER </td>
-<td> Store RDD as <i>serialized</i> Java objects (one byte array per partition).
-This is generally more space-efficient than deserialized objects, especially when using a
-<a href="tuning.html">fast serializer</a>, but more CPU-intensive to read.
-</td>
-</tr>
-<tr>
-<td> MEMORY_AND_DISK_SER </td>
-<td> Similar to MEMORY_ONLY_SER, but spill partitions that don&rsquo;t fit in memory to disk instead of recomputing them
-on the fly each time they&rsquo;re needed. </td>
-</tr>
-<tr>
-<td> DISK_ONLY </td>
-<td> Store the RDD partitions only on disk. </td>
-</tr>
-<tr>
-<td> MEMORY_ONLY_2, MEMORY_AND_DISK_2, etc.  </td>
-<td> Same as the levels above, but replicate each partition on two cluster nodes. </td>
-</tr>
-</tbody></table></p></li>
-</ul>
-
-
-<h3>共享变量</h3>
-
-<p>  正常情况下，当一个方法传给Spark Operation在远程节点上执行时，需要复制方法里的变量传输给各个节点，这些变量在远程节点上并不会更新然后又传回driver程序。为了支持通用情况，这种在task之间共享变量的方式是非常低效的。</p>
-
-<p>  然而，Spark支持两种限定类型的共享变量：broadcast变量和accumulator。</p>
-
-<ul>
-<li>broadcast变量：
-broadcast变量允许用户程序在每个节点上维持一个只读的变量在内存中，而不是在task间来回复制。可以利用broadcast变量将一个小数据集分发并维持到各个节点，实现MapJoin。</li>
-</ul>
-
-
-<p><img src="/images/spark_broadcast_example.png" alt="broadcast_example" /></p>
-
-<ul>
-<li>accumulator:
-accumulator用来实现类似与MapReduce计数器的功能，它只有累加方法。</li>
-</ul>
-
-
-<p><img src="/images/spark_accumulator_example.png" alt="accumulator_example" /></p>
-
-<h3>参考资料：</h3>
-
-<ol>
-<li><a href="http://spark-project.org/docs/latest/scala-programming-guide.html">官方文档</a></li>
-<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2013/02/Parallel-Programming-With-Spark-Matei-Zaharia-Strata-2013.pdf">Parallel Programming With Spark</a></li>
-<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2012/06/matei-zaharia-amp-camp-2012-advanced-spark.pdf">Advanced Spark Features</a></li>
-</ol>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/16/spark-programming-user-guide-for-scalauser/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -897,6 +309,8 @@ accumulator用来实现类似与MapReduce计数器的功能，它只有累加方
 
 <time datetime="2013-07-16T16:27:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
         
+         | <a href="/blog/2013/07/16/spark-programming-user-guide-basic/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -908,103 +322,12 @@ accumulator用来实现类似与MapReduce计数器的功能，它只有累加方
 
 <p>  另一种方式是在自己的project中引用spark的包，开发standalone的Spark Job。用户可以选择自己喜欢的构建工具（sbt/maven etc），构建一个Scala Project，只需要引入spark的包即可。推荐采用sbt构建项目，用eclipse的scala-ide进行开发。下节简单介绍一个简单的SparkHelloWorld项目的构建和开发步骤。</p>
 
-<h3>创建第一个SparkHelloWorld Project</h3>
-
-<ol>
-<li> 安装sbt： 请参考<a href="http://www.scala-sbt.org/release/docs/Getting-Started/Setup.html">这里</a>安装sbt，不在此赘述</li>
-<li> 添加sbteclipse插件。sbteclipse插件用来生成eclipse project，请参考<a href="https://github.com/typesafehub/sbteclipse">这里</a>配置。</li>
-<li> 安装eclipse scala-ide插件：update site 地址在<a href="http://scala-ide.org/download/current.html">这里</a>。    <em>Note：由于Spark是基于Scala 2.9.3构建的，请选择2.9.</em>版本安装*</li>
-<li><p> 构建第一个SparkHelloWorld项目：</p>
-
-<pre><code>hadoop@Aspire-5830TG:~/project/workspace$ mkdir SparkHelloWorld
-hadoop@Aspire-5830TG:~/project/workspace$ cd SparkHelloWorld/
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$ ll
-总用量 0
-#编辑build.sbt，添加spark-core依赖
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$ vim build.sbt
-name := "SparkHelloWorld"
-version := "1.0"
-scalaVersion := "2.9.3"
-libraryDependencies += "org.spark-project" %% "spark-core" % "0.7.3"
-resolvers ++= Seq(
-  "Akka Repository" at "http://repo.akka.io/releases/",
-  "Spray Repository" at "http://repo.spray.cc/")
-#构建eclipse project
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$ sbt eclipse
-[info] Loading global plugins from /home/hadoop/.sbt/plugins
-[info] Set current project to SparkHelloWorld (in build file:/home/hadoop/project/  workspace/SparkHelloWorld/)
-[info] About to create Eclipse project files for your project(s).
-[info] Updating {file:/home/hadoop/project/workspace/SparkHelloWorld/}default-fa0ba0...
-[info] Resolving commons-lang#commons-lang;2.6 ...
-[info] Done updating.
-[info] Successfully created Eclipse project files for project(s):
-[info] SparkHelloWorld
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$ ll -a
-总用量 40
- 4 drwxrwxr-x  5 hadoop hadoop  4096  7月 21 16:18 .
- 4 drwxrwxr-x 40 hadoop hadoop  4096  7月 21 16:13 ..
- 4 -rw-rw-r--  1 hadoop hadoop   264  7月 21 16:17 build.sbt
-12 -rw-rw-r--  1 hadoop hadoop 10903  7月 21 16:17 .classpath
- 4 drwxrwxr-x  3 hadoop hadoop  4096  7月 21 16:17 project
- 4 -rw-rw-r--  1 hadoop hadoop   369  7月 21 16:17 .project
- 4 drwxrwxr-x  4 hadoop hadoop  4096  7月 21 16:17 src
- 4 drwxrwxr-x  5 hadoop hadoop  4096  7月 21 16:17 target
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$ 
-</code></pre></li>
-<li><p> 导入eclipse。<br/>
-<img src="/images/sparkhelloworld_eclipse_project.png" alt="SparkHelloWorld eclipse project " /></p></li>
-<li><p> 创建第一个SparkHelloWorld Job</p>
-
-<pre><code>import spark.SparkContext
-import spark.SparkContext._
-object SparkHelloWorld {
-def main(args: Array[String]): Unit = {
-
-    val sc = new SparkContext("local","SparkHelloWorld","/usr/local/spark/spark-release",List   ("target/scala-2.9.3/sparkhelloworld_2.9.3-1.0.jar"))
-    val log = sc.textFile("/var/log/alternatives.log")
-    val count = log.count()
-    println("log has "+ count + "lines")
-  }
-
-}
-</code></pre></li>
-<li><p> 打包执行</p>
-
-<pre><code>#利用sbt打包
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$ sbt package
-[info] Loading global plugins from /home/hadoop/.sbt/plugins
-[info] Set current project to SparkHelloWorld (in build file:/home/hadoop/project/  workspace/SparkHelloWorld/)
-[info] Compiling 1 Scala source to /home/hadoop/project/workspace/SparkHelloWorld/target/   scala-2.9.3/classes...
-[info] Packaging /home/hadoop/project/workspace/SparkHelloWorld/target/scala-2.9.3/sparkhelloworld_2.9.3-1.0.jar ...
-[info] Done packaging.
-[success] Total time: 5 s, completed 2013-7-21 16:39:28
-#执行
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$ sbt run
-[info] Loading global plugins from /home/hadoop/.sbt/plugins
-[info] Set current project to SparkHelloWorld (in build file:/home/hadoop/project/  workspace/SparkHelloWorld/)
-[info] Running SparkHelloWorld 
-log has 108 lines
-13/07/21 16:39:35 INFO network.ConnectionManager: Selector thread was interrupted!
-[success] Total time: 3 s, completed 2013-7-21 16:39:35
-hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$
-</code></pre></li>
-<li><p> 发布到集群运行</p></li>
-</ol>
-
-
-<p>  上述示例是在本地执行，如要发布到集群运行，需要将SparkContext中Master的地址修改为集群Master的地址，打包并添加到Spark的CLASSPATH 。如：</p>
-
-<pre><code>    val sc = new SparkContext("*spark://10.2.6.152:7077*","SparkHelloWorld","/usr/local/spark/spark-release",List("target/scala-2.9.3/sparkhelloworld_2.9.3-1.0.jar"))
-</code></pre>
-
-<h3>参考资料</h3>
-
-<ol>
-<li> <a href="http://spark-project.org/docs/latest/quick-start.html">spark官方文档</a></li>
-</ol>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/16/spark-programming-user-guide-basic/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -1033,6 +356,8 @@ hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$
 
 <time datetime="2013-07-16T11:58:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
         
+         | <a href="/blog/2013/07/16/spark-deploy/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -1050,196 +375,12 @@ hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$
 
 <p>本章主要介绍本地模式和standalone模式的安装部署配置。</p>
 
-<h3>本地模式</h3>
-
-<p>  <em>注: 本文只介绍Linux的安装部署配置方式，Windows以及Mac下类似，用户请自行参考官方文档</em></p>
-
-<h4>1. 前提条件</h4>
-
-<p>  Spark依赖JDK 6.0以及Scala 2.9.3以上版本，所以首先确保已安装JDK和Scala的合适版本并加入PATH。
-  本节比较简单，不在此赘述。安装完毕，请验证JDK和Scala的版本</p>
-
-<pre><code>hadoop@Aspire-5830TG:~$ echo $JAVA_HOME
-/usr/local/jdk
-hadoop@Aspire-5830TG:~$ java -version
-java version "1.6.0_43"
-Java(TM) SE Runtime Environment (build 1.6.0_43-b01)
-Java HotSpot(TM) 64-Bit Server VM (build 20.14-b01, mixed mode)
-
-hadoop@Aspire-5830TG:~$ echo $SCALA_HOME
-/usr/local/scala
-hadoop@Aspire-5830TG:~$ scala
-Welcome to Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_43).
-Type in expressions to have them evaluated.
-Type :help for more information.
-
-scala&gt; 
-</code></pre>
-
-<h4>2. 安装Spark</h4>
-
-<p>  Spark的安装和简单，只需要将Spark的安装包download下来，加入PATH即可。我们采用官方v0.7.3版本</p>
-
-<pre><code>cd /user/local/spark  
-wget http://spark-project.org/download/spark-0.7.3-prebuilt-hadoop1.tgz 
-tar zxvf spark-0.7.3-prebuilt-hadoop1.tgz  
-ln -s spark-0.7.3 spark-release  
-
-vim /etc/profile  
-export SPARK_HOME=/usr/local/spark/spark-release
-export PATH=$SPARK_HOME/bin
-</code></pre>
-
-<h4>3. 配置Spark</h4>
-
-<p>  Spark的配置文件只有一个: $SPARK_HOME/conf/spark-env.sh。本地开发模式的配置很简单，只需要配置JAVA_HOME和SCALA_HOME。实例如下：</p>
-
-<pre><code>export JAVA_HOME=/usr/local/jdk  
-export SCALA_HOME=/usr/local/scala  
-# add spark example jar to CLASSPATH  
-export SPARK_EXAMPLES_JAR=$SPARK_HOME/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.3.jar  
-</code></pre>
-
-<h4>4. 测试验证</h4>
-
-<p>  Spark提供了两种运行模式：</p>
-
-<p>  1) run脚本: 用于运行已经生成的jar包中的代码，如Spark自带的example中的SparkPi。</p>
-
-<pre><code>hadoop@Aspire-5830TG:/usr/local/spark/spark-release$ ./run  spark.examples.SparkPi local
-
-# 此处略去一万字....
-Pi is roughly 3.1358
-</code></pre>
-
-<p>  2) spark-shell: 用于interactive programming</p>
-
-<pre><code>hadoop@Aspire-5830TG:/usr/local/spark/spark-release$ ./spark-shell 
-Welcome to
-      ____              __  
-     / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  '_/
-   /___/ .__/\_,_/_/ /_/\_\   version 0.7.3
-      /_/                  
-
-Using Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_43)
-Initializing interpreter...
-13/07/16 15:28:04 WARN Utils: Your hostname, Aspire-5830TG resolves to a loopback address: 127.0.0.1; using 172.16.239.1 instead (on interface vmnet8)
-13/07/16 15:28:04 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
-Creating SparkContext...
-Spark context available as sc.
-Type in expressions to have them evaluated.
-Type :help for more information.
-
-scala&gt; val days = List("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
-days: List[java.lang.String] = List(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
-
-scala&gt; val daysRDD = sc.parallelize(days)
-daysRDD: spark.RDD[java.lang.String] = ParallelCollectionRDD[0] at  parallelize at &lt;console&gt;:14
-
-scala&gt; daysRDD.count()
-res0: Long = 7
-
-scala&gt; 
-</code></pre>
-
-<h3>Standalone模式</h3>
-
-<p>  <em>Note：Spark是Master-Worker架构，在部署之前需要确定Master/Worker机器。同时，分布式集群模式要共享HDFS上的数据，因此需要在每个节点安装Hadoop。</em></p>
-
-<h4>1. 前提条件</h4>
-
-<ul>
-<li>集群模式下，Master节点要能够<em>ssh无密码登陆</em>各个Worker节点。</li>
-<li>与本地模式一样，Spark集群的<em>每个节点</em>需要安装JDK和Scala。</li>
-<li>Spark集群的<em>每个节点</em>需要安装Hadoop（作为hadoop client访问HDFS上的数据）。</li>
-</ul>
-
-
-<h4>2. 安装Spark</h4>
-
-<p>  与本地环境一样，Spark集群的<em>每个节点</em>需要download spark的tar.gz包，解压，并配置环境变量。</p>
-
-<h4>3. 配置Spark</h4>
-
-<p>  分布式集群模式下，Spark的配置文件有两个:</p>
-
-<ul>
-<li>$SPARK_HOME/conf/slaves</li>
-</ul>
-
-
-<p>  slaves 是一个文本文件，将各个worker节点的IP加进去，一行一个，示例如：</p>
-
-<pre><code>10.2.6.133
-10.2.6.134
-10.2.6.154
-</code></pre>
-
-<ul>
-<li>$SPARK_HOME/conf/spark-env.sh文件：</li>
-</ul>
-
-
-<p>  Spark的环境配置文件，定义Spark的Master/Worker以及资源定义，示例如：</p>
-
-<pre><code>export JAVA_HOME=/usr/local/jdk 
-export SCALA_HOME=/usr/local/scala
-
-# SSH related
-export SPARK_SSH_OPTS="-p58422 -o StrictHostKeyChecking=no"
-
-# Spark Master IP
-export SPARK_MASTER_IP=10.2.6.152 
-# set the number of cores to use on worker
-export SPARK_WORKER_CORES=16
-# set how much memory to use on worker
-export SPARK_WORKER_MEMORY=16g
-
-export SPARK_EXAMPLES_JAR=/usr/local/spark/spark-0.7.3/examples/target/scala-2.9.3/spark-examples_2.9.3-0.7.3.jar
-
-# LZO codec related
-export LD_LIBRARY_PATH=/usr/local/hadoop/lzo/lib
-export SPARK_LIBRARY_PATH=/usr/local/hadoop/hadoop-release/lib/native/Linux-amd64-64/  
-</code></pre>
-
-<p>  在Spark集群的<em>每个节点</em>上配置好以上两个配置文件</p>
-
-<h4>4. 启动集群</h4>
-
-<p>  在<em>Master</em>节点上，执行如下命令：</p>
-
-<pre><code>[hadoop@cosmos152 spark-release]$ echo $SPARK_HOME
-/usr/local/spark/spark-release
-[hadoop@cosmos152 spark-release]$ bin/start-all.sh 
-starting spark.deploy.master.Master, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.master.Master-1-cosmos152.hadoop.out
-Master IP: 10.2.6.152
-cd /usr/local/spark/spark-0.7.3/bin/.. ; /usr/local/spark/spark-release/bin/start-slave.sh 1 spark://10.2.6.152:7077
-10.2.6.133: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos133.hadoop.out
-10.2.6.134: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos134.hadoop.out
-10.2.6.154: starting spark.deploy.worker.Worker, logging to /usr/local/spark/spark-0.7.3/bin/../logs/spark-hadoop-spark.deploy.worker.Worker-1-cosmos154.hadoop.out
-[hadoop@cosmos152 spark-release]$ 
-</code></pre>
-
-<h4>5. 测试验证</h4>
-
-<p>  推荐部署一个Client节点上，专门用于Spark Job的提交。配置与上述节点一致。在Client节点上，执行以下命令：</p>
-
-<pre><code>hadoop@cosmos155:/usr/local/spark/spark-release$ ./run  spark.examples.SparkPi spark://10.2.6.152:7077
-
-# 此处略去一万字....
-Pi is roughly 3.1358
-</code></pre>
-
-<h3>参考资料：</h3>
-
-<ol>
-<li><a href="http://spark-project.org/docs/latest/index.html">Spark Overview</a></li>
-<li><a href="http://spark-project.org/docs/latest/spark-standalone.html">Standalone Deploy Mode</a></li>
-</ol>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/16/spark-deploy/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -1268,6 +409,8 @@ Pi is roughly 3.1358
 
 <time datetime="2013-07-16T10:58:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
         
+         | <a href="/blog/2013/07/16/spark-core-concept/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -1275,102 +418,12 @@ Pi is roughly 3.1358
 
   <div class="entry-content"><p>Spark的核心思想是RDD，以及对RDD的操作（transformation/action）。本篇简单介绍这些基本概念，以有利于理解Spark的原理。</p>
 
-<h3>(一) RDD(resilient distributed dataset)</h3>
-
-<ol>
-<li><p><strong> RDD的基本概念</strong><br/>
-RDD是AMPLAB提出的一种概念，类似与分布式内存，但又不完全一致（关于RDD与分布式内存的区别可参考<a href="http://www.cs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf">paper</a>）。  <br/>
-RDD在Spark的实现中，其实是一个只读的Scala集合对象，它能够进行分区（partition）以便于分布在各个Worker节点上，同时提供了lineage机制（其实就是维护了当前RDD的父RDD reference以及生成RDD的Operation）保证在Worker节点宕机时自动重建。  <br/>
-RDD是lazy的，不必每次都物化出来，因为它维持了自己的lineage信息，当需要时指向已有的RDD，如果遇到failure而失效重新生成构建即可。  <br/>
-用户可以控制RDD的持久化机制和分区模式。RDD可以只存储在内存中，也可以只存储在磁盘中，当然也可以采用内存+磁盘的混合存储模式。用户可以指定RDD中的一个key选择合适的partitioner来控制RDD的分区模式，这点与MapReduce的partitioner原理一样。</p></li>
-<li><p><strong> RDD是如何构建的？</strong> <br/>
-在Spark中RDD通过以下四种方式构建：</p></li>
-</ol>
-
-
-<p>  1) <em>从文件系统</em></p>
-
-<pre><code>#Load text file from local FS, HDFS, or S3  
-sc.textFile(“file.txt”) 
-sc.textFile(“directory/*.txt”)  
-sc.textFile(“hdfs://namenode:9000/path/file”)   
-</code></pre>
-
-<p>  2) <em>通过Scala集合对象并行化生成</em></p>
-
-<pre><code>#Turn a local collection into an RDD    
-sc.parallelize([1,2,3]) 
-</code></pre>
-
-<p>  3) <em>通过对已存在的RDD transform生成</em><br/>
-  可以通过对一个已存在的RDD的调用transformation operation（比如map/flatMap/filter etc）生成。Spark提供的transformation operation下章介绍，以下是一些例子：</p>
-
-<pre><code>nums = sc.parallelize([1,2,3])  
-
-# Pass each element through a function 
-squares  = nums.map(lambda x: x*x)          # =&gt; {1, 4, 9}  
-
-# Keep elements passing a predicate 
-even  = squares.filter(lambda x:  x % 2  == 0)  # =&gt; {4}    
-
-# Map each element to zero or more others
-nums.flatMap(lambda x: range(0, x))         # =&gt; {0, 0, 1, 0, 1, 2} 
-</code></pre>
-
-<p>  4) <em>通过改变其他RDD的持久化状态</em><br/>
-  RDD是lazy的、临时的。在执行parallel operation时物化创建，用完在内存中销毁。但是用户可以改变cache/save这两种action改变其持久化状态，如下示例：</p>
-
-<pre><code>lines = sc.textFile("hdfs://namenode:9000/path/logfile")
-errors  =  lines.filter(lambda s: s.startswith("ERROR"))
-messages  =  errors.map(lambda s: s.split('\t')[2])
-# cache messages RDD in memory
-messages.cache()
-# save messages RDD to HDFS
-messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
-</code></pre>
-
-<h3>（二）RDD Operations</h3>
-
-<p>  Spark与MapReduce的Map-Shuffle-Reduce计算模型不同，它引入了更细粒度的RDD Operation，有以下两类：</p>
-
-<ul>
-<li>transformation: 生成RDD，从一个已有RDD转换成另一个RDD，如map/filter等</li>
-<li>action: 对RDD的操作，比如count/reduce等</li>
-</ul>
-
-
-<p>  Spark目前支持的RDD Operation如下图：<br/>
-<img src="/images/spark_transformations_actions.png" alt="Spark Transformations &amp; Actions " /></p>
-
-<h3>（三）Shared Variables</h3>
-
-<p>  Spark提供了两种方式来共享变量：</p>
-
-<ul>
-<li>Broadcast variables: 类似于HDFS的DistributedCache，可用于将小数据分发到各Worker节点，以提高执行效率。如下图所示，利用Broadcast variables实现类似MapReduce的MapJoin：</li>
-</ul>
-
-
-<p><img src="/images/spark_broadcast_example.png" alt="broadcast_example" /></p>
-
-<ul>
-<li>Accumulators: 类似于MapReduce里的Counter，实现计数统计。如下图所示，利用accumulator实现Counter:</li>
-</ul>
-
-
-<p><img src="/images/spark_accumulator_example.png" alt="accumulator_example" /></p>
-
-<p><strong>参考资料</strong></p>
-
-<ol>
-<li><a href="http://www.cs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf">Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing</a></li>
-<li><a href="http://www.cs.berkeley.edu/~matei/papers/2010/hotcloud_spark.pdf">Spark: Cluster Computing with Working Sets</a></li>
-<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2013/02/Parallel-Programming-With-Spark-Matei-Zaharia-Strata-2013.pdf">Parallel Programming With Spark</a></li>
-<li><a href="http://ampcamp.berkeley.edu/wp-content/uploads/2012/06/matei-zaharia-amp-camp-2012-advanced-spark.pdf">Advanced Spark Features</a></li>
-</ol>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/16/spark-core-concept/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -1399,6 +452,8 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 
 <time datetime="2013-07-16T09:58:00+08:00" pubdate data-updated="true">Jul 16<span>th</span>, 2013</time>
         
+         | <a href="/blog/2013/07/16/spark-intro/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -1406,42 +461,12 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 
   <div class="entry-content"><p><a href="http://spark-project.org/">Spark</a>是UC Berkeley大学<a href="https://amplab.cs.berkeley.edu/">AMPLAB</a>开源的分布式处理框架。目前已贡献给Apache社区，成为<a href="http://wiki.apache.org/incubator/SparkProposal">inbubator项目</a>。</p>
 
-<p>关于Spark这种分布式处理框架的定位可参考apache的wiki，如下：</p>
-
-<blockquote><p>Spark is an open source system for <strong>fast and flexible large-scale data analysis</strong>. Spark provides a general purpose runtime that supports low-latency execution in several forms. These include <strong>interactive exploration of very large datasets</strong>, <strong>near real-time stream processing</strong>, and <strong>ad-hoc SQL analytics</strong> (through higher layer extensions). Spark interfaces with HDFS, HBase, Cassandra and several other storage storage layers, and <strong>exposes APIs in Scala, Java and Python</strong>. Background Spark started as U.C. Berkeley research project, designed to efficiently run machine learning algorithms on large datasets. Over time, it has evolved into a general computing engine as outlined above. Spark’s developer community has also grown to include additional institutions, such as universities, research labs, and corporations. Funding has been provided by various institutions including the U.S. National Science Foundation, DARPA, and a number of industry sponsors. See: <a href="https://amplab.cs.berkeley.edu/sponsors/">https://amplab.cs.berkeley.edu/sponsors/</a> for full details.</p></blockquote>
-
-<p>  <strong>简单总结一下Spark的特性：</strong></p>
-
-<ul>
-<li>fast: Spark引入了一种叫做RDD的概念（下一篇详细介绍），官方宣称性能比MapReduce高100倍</li>
-<li>fault-tolerant: Spark的RDD采用lineage（血统）来保存其生成轨迹，一旦节点挂掉，可重新生成来保证Job的自动容错</li>
-<li>scalable: Spark跟MapReduce一样，采用Master-Worker架构，可通过增加Worker来自动扩容</li>
-<li>compatible: Spark的存储接口兼容Hadoop，采用inputformat/outputformat来读取HDFS/HBase/Cassandra/S3 etc上的数据</li>
-<li><p>conciseness: Spark采用Scala语言编写，充分利用了Scala语法的简洁性，以及functional编程的便利，整个Spark项目的代码才2W行。当然Spark不仅仅提供了Scala的API，还提供了Java和Python的API。</p>
-
-<p><strong>Spark的定位（适合的场景）：</strong></p>
-
-<p>MapReduce框架在分布式处理领域取得了巨大的成功，但是MapReduce的优势在于处理大规模无环数据流(acyclic data flows
-)，适合于批处理作业，但在以下两种场景下，MapReduce并不高效：</p></li>
-<li><strong>Iterative jobs</strong>（迭代计算型作业）:
-许多机器学习算法（比如KMeans/Logistic Regression等）会针对同一数据集进行多轮迭代运算，每次迭代，仅仅是函数参数的变化，数据集的变化不大。用MapReduce实现这样的算法（比如mahout），每次迭代将是一个MapReduce Job，而每个MapReduce Job都会重新load数据，然后计算，最后持久化到HDFS，这无疑是巨大的IO开销，也是巨大的时间浪费。如果能够将这些需要多轮迭代的数据集Cache在内存中将会带来极大的性能提升，Spark采用RDD思想做到了这一点。</li>
-<li><p><strong>Interactive analytics</strong>（交互式查询分析）:
-虽然在MapReduce框架之上提供了Hive/Pig这样的类SQL引擎来方便用户进行adhoc query，但是其查询效率仍然是巨大的诟病，通常一次查询需要分钟甚至小时级别，难以达到像数据库一样的交互式查询体验。这归结于MapReduce框架设计的初衷并不是提供交互式处理，而是批处理类型的处理任务，例如MapReduce的Map处理要将中间结果持久化到本地磁盘需要Disk IO开销，shuffle阶段需要将Map中间结果HTTP fetch到Reduce端需要网络IO开销，每个Job的Reduce需要将结果持久化到HDFS才能进行下一次Job，下一次Job又需要重新从HDFS load上一次Job的结果。这种计算模型进行一些大规模数据集的批处理作业是OK的，但是不能够提供快速的交互式adhoc查询（秒级别）。Spark放弃了Map-Shuffle-Reduce这样简单粗暴的编程模型而采用Transformation/Action模型，利用RDD思想能够将中间结果缓存起来而不是持久化，同时提供了一个与Hive一致的SQL接口（Shark）达到了MPP分布式数据库交互式查询的效率（39GB数据/次秒级响应时间）。</p>
-
-<p><strong>后边的几篇文章将会对Spark做深一步的研究</strong></p></li>
-<li><p>核心思想篇： 介绍Spark的核心思想，包括RDD、并行操作（Transform/Action）以及共享变量的设计与实现。</p></li>
-<li>安装部署篇： 介绍如何安装部署Spark，包括本地开发测试环境，以及分布式集群生产环境</li>
-<li>Spark Programming Guide篇： 介绍如何利用Spark的并行编程API进行Spark Task编程</li>
-<li><p>Spark Example篇： 给出一些通用的Spark编程实例</p>
-
-<p><strong>Spark相关资源</strong></p></li>
-<li><p><a href="http://spark-project.org/">官网</a></p></li>
-<li><a href="https://github.com/mesos/spark">Github</a></li>
-<li><a href="http://ampcamp.berkeley.edu/">AMPCamp</a></li>
-</ul>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/16/spark-intro/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -1470,6 +495,8 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 
 <time datetime="2013-07-09T16:27:00+08:00" pubdate data-updated="true">Jul 9<span>th</span>, 2013</time>
         
+         | <a href="/blog/2013/07/09/shark-introduction/#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -1481,61 +508,12 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 
 <blockquote><p>Shark is a large-scale data warehouse system for Spark designed to be compatible with Apache Hive. It can answer Hive QL queries up to 100 times faster than Hive without modification to the existing data nor queries. Shark supports Hive&rsquo;s query language, metastore, serialization formats, and user-defined functions.</p></blockquote>
 
-<p>简要总结下Shark的特性[2]：</p>
-
-<ul>
-<li>builds on Spark</li>
-<li>scales out &amp; fault-tolerant</li>
-<li>supports low-latency, interactive queries through in-memory compution</li>
-<li>support both SQL and complex analytics such as machine learning</li>
-<li>is compatible with Apache Hive (storage, serde, UDF, types, metadata)</li>
-</ul>
-
-
-<h3>Shark的架构</h3>
-
-<p>Shark是架构在Hive之上的，它复用了Hive的架构并增加了一些特性，所以Shark的整个代码量很小，大约1万多行。</p>
-
-<p><img src="/images/hive_arch.png">
-<img src="/images/shark_arch.png"></p>
-
-<p>从上两张图中可以看出，Shark复用了Hive的大部分组件，包括：</p>
-
-<ol>
-<li>SQL Parser: Shark完全兼容Hive的HQL语法</li>
-<li>metastore：Shark采用和Hive一样的meta信息，Hive里创建的表用Shark可无缝访问</li>
-<li>SerDe: Shark的序列化机制以及数据类型与Hive完全一致</li>
-<li>UDF: Shark可重用Hive里的所有UDF</li>
-<li>Driver： Shark在Hive的CliDriver基础上进行了一个封装，生成一个SharkCliDriver，这是shark命令的入口</li>
-<li>ThriftServer：Shark在Hive的ThriftServer（支持JDBC/ODBC）基础上，做了一个封装，生成了一个SharkServer，也提供JDBC/ODBC服务。</li>
-</ol>
-
-
-<h3>Shark的使用技巧</h3>
-
-<ol>
-<li>选择运行模式：
-在Shark的CliDriver里，可以通过set shark.exec.mode=shark/hive来选择用shark还是hive来执行HQL</li>
-<li><p>创建缓存表以提高查询速度：
-可以创建缓存表将数据cache在内存中，以提高查询速度。以下两种DDL语法均可以：</p>
-
-<ul>
-<li>CREATE TABLE wiki_small_in_mem TBLPROPERTIES (&ldquo;shark.cache&rdquo; = &ldquo;true&rdquo;) AS SELECT * FROM wiki;</li>
-<li>CREATE TABLE wiki_cached AS SELECT * FROM wiki;</li>
-</ul>
-</li>
-</ol>
-
-
-<h3>参考资料</h3>
-
-<ol>
-<li><a href="https://github.com/amplab/shark/wiki">https://github.com/amplab/shark/wiki</a></li>
-<li><a href="https://speakerdeck.com/zhuguangbin/shark-sql-and-rich-analytics-at-scale">https://speakerdeck.com/zhuguangbin/shark-sql-and-rich-analytics-at-scale</a></li>
-</ol>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/09/shark-introduction/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -1552,6 +530,29 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 <aside class="sidebar">
   
     <section>
+  <h1>About Me</h1>
+  <div style="margin-top:15px; ">
+<img style="" class="left" src="http://m.c.lnkd.licdn.com/media/p/4/000/159/074/24c4d84.jpg">
+<p><a href="http://zhuguangbin.github.io">Zhu Guangbin</a></p>
+<p>Senior Software Engineer @DianPing</p>
+<br>
+<p>Focusing on BigData, <br>
+Play with Hadoop/Hive/HBase/Spark/Shark</p>
+Linkedin: <a href="http://www.linkedin.com/in/zhuguangbin">Zhu Guangbin</a><br>
+SinaWeibo: <a href="http://weibo.com/2406795361/profile">BigDataPlayer</a><br>
+Email: <a href="mailto:zhu.guangbin86@gmail.com">zhu.guangbin86@gmail.com</a><br>
+</div>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/shark/'>Shark (2)</a></li>
+<li class='category'><a href='/blog/categories/spark/'>Spark (7)</a></li>
+<li class='category'><a href='/blog/categories/unknown/'>unknown (1)</a></li>
+
+  </ul>
+</section>
+<section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
     
@@ -1595,9 +596,39 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 </footer>
   
 
+<script type="text/javascript">
+      var disqus_shortname = 'zhuguangbin';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
 
 
 

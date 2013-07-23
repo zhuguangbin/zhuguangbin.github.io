@@ -4,11 +4,11 @@
   <title><![CDATA[Data Talks]]></title>
   <link href="http://zhuguangbin.github.io/atom.xml" rel="self"/>
   <link href="http://zhuguangbin.github.io/"/>
-  <updated>2013-07-23T15:35:14+08:00</updated>
+  <updated>2013-07-23T18:43:11+08:00</updated>
   <id>http://zhuguangbin.github.io/</id>
   <author>
     <name><![CDATA[Zhu Guangbin]]></name>
-    
+    <email><![CDATA[zhu.guangbin86@gmail.com]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
@@ -18,7 +18,10 @@
     <link href="http://zhuguangbin.github.io/blog/2013/07/23/shark-vs-hive-benchmark-test/"/>
     <updated>2013-07-23T13:42:00+08:00</updated>
     <id>http://zhuguangbin.github.io/blog/2013/07/23/shark-vs-hive-benchmark-test</id>
-    <content type="html"><![CDATA[<p>为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。</p>
+    <content type="html"><![CDATA[<p>为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比，测试性能非常满意，虽然没有达到官方宣称的100倍，但至少10倍的性能提升。</p>
+
+<!--more-->
+
 
 <h4>测试工具与方法：</h4>
 
@@ -120,6 +123,9 @@
 
 
 <p>  本篇首先介绍Shark的安装部署配置，然后介绍我们在将Shark集成到我们的Hadoop集群中遇到的一些坑和我们的解决方案。</p>
+
+<!--more-->
+
 
 <h3>版本选择</h3>
 
@@ -384,6 +390,9 @@
     <content type="html"><![CDATA[<h3>概述</h3>
 
 <p>  上一节简单介绍了如何搭建Spark的本地开发环境，并示例了一个SparkHelloWorld project。本节详细介绍Spark的Scala API，并介绍Spark编程的高级特性。</p>
+
+<!--more-->
+
 
 <p>  Spark程序其实是一个包含main函数的driver程序，它通知集群对RDD进行一系列的并行操作。RDD是Spark的核心，它分片分布在集群的各个节点上，以便进行并行操作。RDD通过hdfs或其他hadoop支持的文件系统创建，或者从其他已存在的RDD转换而来。用户可以对RDD进行一些列的动作操作，比如count，reduce等。也可以转变RDD的存储状态，比如，cache将RDD缓存在内存中，save将RDD保存到文件系统。RDD自身是fault-tolerant，当节点宕机时通过血统来recovery。</p>
 
@@ -695,6 +704,9 @@ accumulator用来实现类似与MapReduce计数器的功能，它只有累加方
 
 <p>  另一种方式是在自己的project中引用spark的包，开发standalone的Spark Job。用户可以选择自己喜欢的构建工具（sbt/maven etc），构建一个Scala Project，只需要引入spark的包即可。推荐采用sbt构建项目，用eclipse的scala-ide进行开发。下节简单介绍一个简单的SparkHelloWorld项目的构建和开发步骤。</p>
 
+<!--more-->
+
+
 <h3>创建第一个SparkHelloWorld Project</h3>
 
 <ol>
@@ -809,6 +821,9 @@ hadoop@Aspire-5830TG:~/project/workspace/SparkHelloWorld$
 
 
 <p>本章主要介绍本地模式和standalone模式的安装部署配置。</p>
+
+<!--more-->
+
 
 <h3>本地模式</h3>
 
@@ -1008,6 +1023,9 @@ Pi is roughly 3.1358
     <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-core-concept</id>
     <content type="html"><![CDATA[<p>Spark的核心思想是RDD，以及对RDD的操作（transformation/action）。本篇简单介绍这些基本概念，以有利于理解Spark的原理。</p>
 
+<!--more-->
+
+
 <h3>(一) RDD(resilient distributed dataset)</h3>
 
 <ol>
@@ -1112,6 +1130,9 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
     <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-intro</id>
     <content type="html"><![CDATA[<p><a href="http://spark-project.org/">Spark</a>是UC Berkeley大学<a href="https://amplab.cs.berkeley.edu/">AMPLAB</a>开源的分布式处理框架。目前已贡献给Apache社区，成为<a href="http://wiki.apache.org/incubator/SparkProposal">inbubator项目</a>。</p>
 
+<!--more-->
+
+
 <p>关于Spark这种分布式处理框架的定位可参考apache的wiki，如下：</p>
 
 <blockquote><p>Spark is an open source system for <strong>fast and flexible large-scale data analysis</strong>. Spark provides a general purpose runtime that supports low-latency execution in several forms. These include <strong>interactive exploration of very large datasets</strong>, <strong>near real-time stream processing</strong>, and <strong>ad-hoc SQL analytics</strong> (through higher layer extensions). Spark interfaces with HDFS, HBase, Cassandra and several other storage storage layers, and <strong>exposes APIs in Scala, Java and Python</strong>. Background Spark started as U.C. Berkeley research project, designed to efficiently run machine learning algorithms on large datasets. Over time, it has evolved into a general computing engine as outlined above. Spark’s developer community has also grown to include additional institutions, such as universities, research labs, and corporations. Funding has been provided by various institutions including the U.S. National Science Foundation, DARPA, and a number of industry sponsors. See: <a href="https://amplab.cs.berkeley.edu/sponsors/">https://amplab.cs.berkeley.edu/sponsors/</a> for full details.</p></blockquote>
@@ -1159,6 +1180,9 @@ messages.saveAsTextFile("hdfs://namenode:9000/path/errorlogfile")
 <p>   Shark[1]是UC Berkeley AMPLAB开源的一款数据仓库产品，它完全兼容Hive的HQL语法，但与Hive不同的是，Hive的计算框架采用MapReduce，而Shark采用Spark（也是AMPLAB开源的分布式计算框架，充分利用内存，适合于迭代计算，官方宣称性能比MapReduce好100倍）。所以Hive是SQL on MapReduce，而Shark是Hive on Spark。以下是官方简介：</p>
 
 <blockquote><p>Shark is a large-scale data warehouse system for Spark designed to be compatible with Apache Hive. It can answer Hive QL queries up to 100 times faster than Hive without modification to the existing data nor queries. Shark supports Hive&rsquo;s query language, metastore, serialization formats, and user-defined functions.</p></blockquote>
+
+<!--more-->
+
 
 <p>简要总结下Shark的特性[2]：</p>
 

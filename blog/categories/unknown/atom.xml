@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: unknown | Data Talks]]></title>
+  <link href="http://zhuguangbin.github.io/blog/categories/unknown/atom.xml" rel="self"/>
+  <link href="http://zhuguangbin.github.io/"/>
+  <updated>2013-07-23T18:43:11+08:00</updated>
+  <id>http://zhuguangbin.github.io/</id>
+  <author>
+    <name><![CDATA[Zhu Guangbin]]></name>
+    <email><![CDATA[zhu.guangbin86@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[My first blog on GitHub]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/07/my-first-blog/"/>
+    <updated>2013-07-07T17:15:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/07/my-first-blog</id>
+    <content type="html"><![CDATA[<p>之前的Blog由于欠费被停了，而且也觉得每年花费那200块钱不值得，故找了找免费的Blog，意外发现了Github Pages，惊喜~</p>
+
+<p>用Markdown像敲代码一样写Blog，而且随时随地记录，然后还能git commit，简直就是技术人员的福音啊</p>
+
+<p>后续准备整理几篇Blog，把最近做的事情梳理一下：</p>
+
+<blockquote><ul>
+<li>Spark&amp;Shark的调研：总结下Spark/Shark的基本思想，安装部署文档，以及遇到的问题</li>
+<li>Hive的代码研究：准备出一个系列，介绍Hive的实现原理</li>
+</ul>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>
