@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Hive | Data Talks]]></title>
+  <link href="http://zhuguangbin.github.io/blog/categories/hive/atom.xml" rel="self"/>
+  <link href="http://zhuguangbin.github.io/"/>
+  <updated>2013-07-23T20:27:12+08:00</updated>
+  <id>http://zhuguangbin.github.io/</id>
+  <author>
+    <name><![CDATA[Zhu Guangbin]]></name>
+    <email><![CDATA[zhu.guangbin86@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Hive principal introduction and shark introduction]]></title>
+    <link href="http://zhuguangbin.github.io/blog/2013/07/23/hive-principal-introduction-and-shark-introduction/"/>
+    <updated>2013-07-23T20:23:00+08:00</updated>
+    <id>http://zhuguangbin.github.io/blog/2013/07/23/hive-principal-introduction-and-shark-introduction</id>
+    <content type="html"><![CDATA[<p>前段时间分享的Hive原理介绍以及Shark简介的PPT。</p>
+
+<script async class="speakerdeck-embed" data-id="8cc3b680c9c201304b167a256e1aaa1f" data-ratio="1.41436464088398" src="http://zhuguangbin.github.io//speakerdeck.com/assets/embed.js"></script>
+
+]]></content>
+  </entry>
+  
+</feed>

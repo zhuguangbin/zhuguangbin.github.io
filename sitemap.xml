@@ -51,6 +51,12 @@
         <lastmod>2013-07-23T18:13:23+08:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://zhuguangbin.github.io/blog/2013/07/23/hive-principal-introduction-and-shark-introduction/
+        </loc>
+        <lastmod>2013-07-23T20:26:42+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://zhuguangbin.github.io/about/</loc>
         <lastmod>2013-07-23T17:41:31+08:00</lastmod>
     </url>
@@ -60,10 +66,10 @@
     </url>
     <url>
         <loc>http://zhuguangbin.github.io/</loc>
-        <lastmod>2013-07-23T20:00:57+08:00</lastmod>
+        <lastmod>2013-07-23T20:26:42+08:00</lastmod>
     </url>
     <url>
         <loc>http://zhuguangbin.github.io/blog/archives/</loc>
-        <lastmod>2013-07-23T20:00:57+08:00</lastmod>
+        <lastmod>2013-07-23T20:26:42+08:00</lastmod>
     </url>
 </urlset>

@@ -9,7 +9,7 @@
   <meta name="author" content="Zhu Guangbin">
 
   
-  <meta name="description" content="为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比，测试性能非常满意，虽然没有达到官方宣称的100倍，但至少10倍的性能提升。 ">
+  <meta name="description" content="前段时间分享的Hive原理介绍以及Shark简介的PPT。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +67,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/23/hive-principal-introduction-and-shark-introduction/">Hive Principal Introduction and Shark Introduction</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-23T20:23:00+08:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2013</time>
+        
+         | <a href="/blog/2013/07/23/hive-principal-introduction-and-shark-introduction/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>前段时间分享的Hive原理介绍以及Shark简介的PPT。</p>
+
+<script async class="speakerdeck-embed" data-id="8cc3b680c9c201304b167a256e1aaa1f" data-ratio="1.41436464088398" src="//speakerdeck.com/assets/embed.js"></script>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -472,53 +513,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/09/shark-introduction/">Shark初窥</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-09T16:27:00+08:00" pubdate data-updated="true">Jul 9<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/07/09/shark-introduction/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>Shark简介</h2>
-
-<p>   Shark[1]是UC Berkeley AMPLAB开源的一款数据仓库产品，它完全兼容Hive的HQL语法，但与Hive不同的是，Hive的计算框架采用MapReduce，而Shark采用Spark（也是AMPLAB开源的分布式计算框架，充分利用内存，适合于迭代计算，官方宣称性能比MapReduce好100倍）。所以Hive是SQL on MapReduce，而Shark是Hive on Spark。以下是官方简介：</p>
-
-<blockquote><p>Shark is a large-scale data warehouse system for Spark designed to be compatible with Apache Hive. It can answer Hive QL queries up to 100 times faster than Hive without modification to the existing data nor queries. Shark supports Hive&rsquo;s query language, metastore, serialization formats, and user-defined functions.</p></blockquote>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/07/09/shark-introduction/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -563,7 +557,8 @@ Email: <a href="mailto:zhu.guangbin86@gmail.com">zhu.guangbin86@gmail.com</a><br
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/shark/'>Shark (2)</a></li>
+    <li class='category'><a href='/blog/categories/hive/'>Hive (1)</a></li>
+<li class='category'><a href='/blog/categories/shark/'>Shark (3)</a></li>
 <li class='category'><a href='/blog/categories/spark/'>Spark (7)</a></li>
 <li class='category'><a href='/blog/categories/unknown/'>unknown (1)</a></li>
 
@@ -572,6 +567,10 @@ Email: <a href="mailto:zhu.guangbin86@gmail.com">zhu.guangbin86@gmail.com</a><br
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/07/23/hive-principal-introduction-and-shark-introduction/">Hive principal introduction and shark introduction</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/23/shark-vs-hive-benchmark-test/">Shark vs Hive Benchmark Test</a>
@@ -587,10 +586,6 @@ Email: <a href="mailto:zhu.guangbin86@gmail.com">zhu.guangbin86@gmail.com</a><br
     
       <li class="post">
         <a href="/blog/2013/07/16/spark-programming-user-guide-for-javauser/">Spark Programming User Guide For Java User</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/16/spark-programming-user-guide-for-scalauser/">Spark Programming User Guide For Scala User</a>
       </li>
     
   </ul>
