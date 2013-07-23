@@ -290,6 +290,44 @@
 
 <blockquote><p>Note: 在build Shark时，一定要选择amplab patched的HIVE_HOME，否则build出来的shark的SharkSemanticAnalyzer会有问题。我们后续将对Hive的依赖迁移到我们的Hive版本。</p></blockquote>
 
+<ol>
+<li><p>ArrayIndexOutOfBoundsException:</p>
+
+<ul>
+<li>描述：在偶尔情况下，会产生如下错误：
+  13/07/23 11:14:07 WARN lazybinary.LazyBinaryStruct: Extra bytes detected at the end of the row! Ignoring similar problems.
+  13/07/23 11:14:07 ERROR executor.Executor: Exception in task ID 50
+  java.lang.ArrayIndexOutOfBoundsException
+      at java.lang.System.arraycopy(Native Method)
+      at org.apache.hadoop.io.Text.set(Text.java:205)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
+      at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
+      at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
+      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
+      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
+      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+      at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
+      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+      at scala.collection.Iterator$class.foreach(Iterator.scala:772)
+      at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
+      at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
+      at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
+      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+      at spark.scheduler.ResultTask.run(ResultTask.scala:77)
+      at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+      at java.lang.Thread.run(Thread.java:662)</li>
+<li>原因：apache 官方hive的版本存在concurrency问题。感谢Intel的<a href="http://weibo.com/u/2122584747">jerryshao</a>的建议。sharkuser的google group上有人讨论这个问题，见这个<a href="https://groups.google.com/forum/#!searchin/shark-users/java.lang.ArrayIndexOutOfBoundsException/shark-users/QcrcV5BPPek/Bue9Cp2Zk5wJ">topic</a></li>
+<li>解决方案：采用amplab的hive版本，修复掉了concurrency问题。后续，我们将梳理amplab的hive版本与我们自己版本的差异，让shark依赖我们自有版本的hive而不是amplab的版本。</li>
+</ul>
+</li>
+</ol>
+
+
 <h3>参考资料</h3>
 
 <ol>
