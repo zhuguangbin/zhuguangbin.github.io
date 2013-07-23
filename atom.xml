@@ -4,7 +4,7 @@
   <title><![CDATA[Data Talks]]></title>
   <link href="http://zhuguangbin.github.io/atom.xml" rel="self"/>
   <link href="http://zhuguangbin.github.io/"/>
-  <updated>2013-07-23T12:23:39+08:00</updated>
+  <updated>2013-07-23T12:31:07+08:00</updated>
   <id>http://zhuguangbin.github.io/</id>
   <author>
     <name><![CDATA[Zhu Guangbin]]></name>
@@ -221,8 +221,9 @@
 <li><p>ArrayIndexOutOfBoundsException:</p>
 
 <ul>
-<li>描述：在偶尔情况下，会产生如下错误：
-  13/07/23 11:14:07 WARN lazybinary.LazyBinaryStruct: Extra bytes detected at the end of the row! Ignoring similar problems.
+<li><p>描述：在偶尔情况下，会产生如下错误：</p>
+
+<pre><code>  13/07/23 11:14:07 WARN lazybinary.LazyBinaryStruct: Extra bytes detected at the end of the row! Ignoring similar problems.
   13/07/23 11:14:07 ERROR executor.Executor: Exception in task ID 50
   java.lang.ArrayIndexOutOfBoundsException
       at java.lang.System.arraycopy(Native Method)
@@ -247,8 +248,9 @@
       at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
       at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
-      at java.lang.Thread.run(Thread.java:662)</li>
-<li>原因：apache 官方hive的版本存在concurrency问题。感谢Intel的<a href="http://weibo.com/u/2122584747">jerryshao</a>的建议。sharkuser的google group上有人讨论这个问题，见这个<a href="https://groups.google.com/forum/#!searchin/shark-users/java.lang.ArrayIndexOutOfBoundsException/shark-users/QcrcV5BPPek/Bue9Cp2Zk5wJ">topic</a></li>
+      at java.lang.Thread.run(Thread.java:662)
+</code></pre></li>
+<li><p>原因：apache 官方hive的版本存在concurrency问题。感谢Intel的<a href="http://weibo.com/u/2122584747">jerryshao</a>的建议。sharkuser的google group上有人讨论这个问题，见这个<a href="https://groups.google.com/forum/#!searchin/shark-users/java.lang.ArrayIndexOutOfBoundsException/shark-users/QcrcV5BPPek/Bue9Cp2Zk5wJ">topic</a></p></li>
 <li>解决方案：采用amplab的hive版本，修复掉了concurrency问题。后续，我们将梳理amplab的hive版本与我们自己版本的差异，让shark依赖我们自有版本的hive而不是amplab的版本。</li>
 </ul>
 </li>
