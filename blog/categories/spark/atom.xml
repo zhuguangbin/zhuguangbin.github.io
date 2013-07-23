@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Spark | Data Talks]]></title>
   <link href="http://zhuguangbin.github.io/blog/categories/spark/atom.xml" rel="self"/>
   <link href="http://zhuguangbin.github.io/"/>
-  <updated>2013-07-23T18:48:23+08:00</updated>
+  <updated>2013-07-23T20:01:26+08:00</updated>
   <id>http://zhuguangbin.github.io/</id>
   <author>
     <name><![CDATA[Zhu Guangbin]]></name>
@@ -349,7 +349,7 @@ accumulator用来实现类似与MapReduce计数器的功能，它只有累加方
     <id>http://zhuguangbin.github.io/blog/2013/07/16/spark-programming-user-guide-basic</id>
     <content type="html"><![CDATA[<h3>开发环境搭建</h3>
 
-<p>  开发Spark最便捷的方式就是利用spark-shell，交互式编程。参考<a href="http://localhost:4000/blog/2013/07/16/spark-deploy/">安装部署篇</a>本地模式，在本地部署好Spark，打开spark-shell即可。</p>
+<p>  开发Spark最便捷的方式就是利用spark-shell，交互式编程。参考<a href="http://zhuguangbin.github.io/blog/2013/07/16/spark-deploy/">安装部署篇</a>本地模式，在本地部署好Spark，打开spark-shell即可。</p>
 
 <p>  另一种方式是在自己的project中引用spark的包，开发standalone的Spark Job。用户可以选择自己喜欢的构建工具（sbt/maven etc），构建一个Scala Project，只需要引入spark的包即可。推荐采用sbt构建项目，用eclipse的scala-ide进行开发。下节简单介绍一个简单的SparkHelloWorld项目的构建和开发步骤。</p>
 
