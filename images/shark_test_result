@@ -1,0 +1,744 @@
+-hiveconf hive.root.logger=ERROR,console -hiveconf dfs.umaskmode=000 -f hql_benchmark.sql
+Starting the Shark Command Line Client
+WARNING: org.apache.hadoop.metrics.jvm.EventCounter is deprecated. Please use org.apache.hadoop.log.metrics.EventCounter in all the log4j.properties files.
+Logging initialized using configuration in jar:file:/usr/local/hadoop/hive-0.9.0/lib/hive-common-0.9.0.jar!/hive-log4j.properties
+Hive history file=/data/hive-query-log/hadoop/hive_job_log_hadoop_201307231127_1736731356.txt
+13/07/23 11:27:32 ERROR DataNucleus.Plugin: Bundle "org.eclipse.jdt.core" requires "org.eclipse.core.resources" but it cannot be resolved.
+13/07/23 11:27:32 ERROR DataNucleus.Plugin: Bundle "org.eclipse.jdt.core" requires "org.eclipse.core.runtime" but it cannot be resolved.
+13/07/23 11:27:32 ERROR DataNucleus.Plugin: Bundle "org.eclipse.jdt.core" requires "org.eclipse.text" but it cannot be resolved.
+OK
+Time taken: 2.874 seconds
+OK
+Time taken: 0.02 seconds
+OK
+Time taken: 1.459 seconds
+OK
+Time taken: 0.062 seconds
+OK
+accesslog_hbase
+accesslog_nanhui_hbase
+addtoentertaimment
+cityname
+cpsdealfeedbacklog_nanhui_hbase
+cpsdealfeedbackorder_hbase
+cpsdealfeedbackpay_hbase
+cpsredirectlog_hbase
+cpsredirectlog_nanhui_hbase
+cyf_shop_tmp
+cyf_test_20130621
+cyf_test_20130708
+dp_hotcityregion
+dp_regionentertainment
+dp_shop_atmosphere
+dp_shop_character
+dp_shop_hbase
+dp_shop_tags
+dp_shopcategory_hbase
+dp_shopnavitag
+dp_shopregion_hbase
+dp_useridcatscore
+dp_useridregionscore
+dp_userprice
+dpdm_device_permanent_city_plus_hbase
+dpdm_tgmkt_dealgroup_m_test20130605
+dprpt_rule
+dprpt_tgdh_hourly_monitor
+dprpt_user_latlng
+dptmp_cyf_shop_500_dealgroup
+dptmp_cyf_shop_traffic2
+dptmp_cyf_shop_traffic8
+dptmp_cyf_shop_traffic9
+foodtoentertainment
+guiduseridcount
+hostcount2
+in_shopstar_his
+invites
+mainuserid
+molly_test_accu
+pokes
+rp_tmp_activeshop_0605
+rp_tmp_activeshop_060501
+rp_tmp_activeshop_060502
+rp_tmp_activeshop_060503
+rp_tmp_activeshop_060504
+rp_tmp_activeshop_060505
+rp_tmp_activeshop_060506
+rp_tmp_activeshop_060507
+rp_tmp_activeshop_060508
+rp_tmp_activeshop_060509
+rp_tmp_activeshop_close_0605
+rp_tmp_shopstartest_0711
+src
+src_bak
+test_dpdw_traffic_base
+tmp_wanglongxi_deviceid
+tmp_yy_deviceid
+tmp_yy_deviceid2
+tmp_yy_deviceid3
+tmp_yy_deviceid_0718
+tmp_zhu_hoteldealbuy
+tmp_zhu_hoteltemp_dealtraffic
+tmp_zhu_hoteltemp_hoteltraffic
+tmp_zhu_push_joinsession_time
+tmp_zhu_push_joinsession_time_order
+tmp_zhu_push_joinsession_time_order_goal
+ty_2013_06_24
+ty_2013_07_09_cityregion_active
+ty_shop_completeness_2013_07_08
+zqx__feedshop
+zqx__feeduser
+zqx_closedshop_0609
+zqx_closedshop_060900
+zqx_closedshop_060901
+zqx_closedshop_060902
+zqx_closedshop_060903
+zqx_closedshop_060904
+zqx_closedshop_060905
+zqx_closedshop_060906
+zqx_closedshop_060907
+zqx_closedshop_060908
+zqx_closedshop_060909
+zqx_feedback_new_feature_0603_0609
+zqx_feedback_new_feature_0610_0616
+zqx_feedback_new_feature_0617_0623
+zqx_feedback_new_feature_0625
+zqx_feedback_new_feature_0625_shop0
+zqx_feedback_new_feature_0625_user0
+zqx_feedback_new_feature_0625_user1
+zqx_feedback_new_feature_0625_user2
+zqx_feedback_new_feature_0625_user3
+zqx_feedbackshop_closed_0618
+zqx_feedbackshop_closed_061800
+zqx_feedbackshop_closed_061801
+zqx_feedbackshop_closed_061802
+zqx_feedbackshop_closed_061803
+zqx_feedbackshop_closed_061804
+zqx_feedbackshop_closed_061805
+zqx_feedbackshop_closed_061806
+zqx_feedbackshop_closed_061807
+zqx_feedbackshop_closed_061808
+zqx_feedbackshop_closed_061809
+zqx_feedbackshop_normal_0618
+zqx_feedbackshop_normal_061800
+zqx_feedbackshop_normal_061801
+zqx_feedbackshop_normal_061802
+zqx_feedbackshop_normal_061803
+zqx_feedbackshop_normal_061804
+zqx_feedbackshop_normal_061805
+zqx_feedbackshop_normal_061806
+zqx_feedbackshop_normal_061807
+zqx_feedbackshop_normal_061808
+zqx_feedbackshop_normal_061809
+zqx_normalshop_0609
+zqx_normalshop_060900
+zqx_normalshop_060901
+zqx_normalshop_060902
+zqx_normalshop_060903
+zqx_normalshop_060904
+zqx_normalshop_060905
+zqx_normalshop_060906
+zqx_normalshop_060907
+zqx_normalshop_060908
+zqx_normalshop_060909
+Time taken: 0.201 seconds
+OK
+dp_shop_tags
+in_shopstar_his
+invites
+pokes
+Time taken: 0.108 seconds
+OK
+Time taken: 0.145 seconds
+OK
+Time taken: 0.111 seconds
+OK
+Time taken: 0.129 seconds
+OK
+Time taken: 0.257 seconds
+OK
+Time taken: 0.647 seconds
+Copying data from file:/usr/local/hadoop/hive-0.9.0/examples/files/kv1.txt
+Copying file: file:/usr/local/hadoop/hive-0.9.0/examples/files/kv1.txt
+Loading data to table tmp.pokes
+Moved to trash: hdfs://10.2.6.102/user/hive/warehouse/tmp.db/pokes
+OK
+Time taken: 6.089 seconds
+Copying data from file:/usr/local/hadoop/hive-0.9.0/examples/files/kv2.txt
+Copying file: file:/usr/local/hadoop/hive-0.9.0/examples/files/kv2.txt
+Loading data to table tmp.invites partition (ds=2013-01-25)
+OK
+Time taken: 0.819 seconds
+Loading data to table tmp.invites partition (ds=2013-01-24)
+OK
+Time taken: 0.286 seconds
+OK
+474
+281
+179
+291
+62
+271
+217
+135
+167
+468
+423
+413
+245
+455
+425
+241
+177
+272
+231
+448
+287
+246
+440
+31
+373
+447
+443
+175
+278
+296
+147
+428
+126
+249
+21
+273
+441
+106
+371
+153
+356
+217
+490
+33
+35
+421
+243
+402
+128
+10
+226
+133
+333
+15
+110
+391
+343
+275
+0
+485
+293
+240
+241
+286
+85
+408
+477
+455
+99
+335
+476
+482
+367
+59
+48
+424
+226
+494
+488
+94
+485
+393
+349
+11
+161
+123
+409
+50
+265
+402
+128
+468
+314
+497
+224
+63
+344
+4
+277
+135
+3
+206
+101
+331
+114
+209
+281
+56
+239
+389
+114
+254
+235
+390
+165
+304
+264
+196
+238
+20
+11
+492
+129
+257
+71
+289
+453
+421
+82
+58
+5
+86
+249
+438
+360
+323
+222
+42
+467
+411
+175
+429
+338
+281
+68
+185
+16
+147
+119
+492
+473
+376
+347
+120
+213
+306
+393
+427
+291
+426
+132
+446
+386
+65
+121
+388
+184
+375
+284
+191
+129
+246
+197
+491
+369
+262
+122
+438
+351
+390
+352
+23
+226
+328
+382
+342
+349
+480
+102
+497
+487
+480
+331
+409
+475
+463
+183
+177
+399
+15
+318
+149
+392
+77
+275
+476
+258
+174
+252
+114
+87
+161
+75
+264
+48
+336
+340
+390
+443
+484
+407
+189
+305
+367
+6
+260
+2
+349
+170
+51
+355
+363
+164
+118
+310
+104
+19
+80
+117
+326
+47
+121
+241
+450
+140
+212
+308
+30
+405
+239
+119
+358
+11
+49
+143
+153
+341
+21
+105
+157
+416
+199
+375
+42
+89
+363
+395
+347
+386
+77
+454
+293
+364
+20
+89
+461
+52
+40
+8
+168
+384
+313
+324
+310
+206
+381
+404
+206
+385
+259
+226
+262
+69
+303
+245
+260
+328
+322
+122
+241
+469
+404
+384
+76
+116
+42
+104
+481
+303
+93
+277
+406
+451
+53
+32
+132
+192
+58
+351
+70
+443
+356
+399
+205
+352
+52
+21
+317
+330
+209
+138
+429
+160
+267
+454
+257
+76
+174
+412
+16
+375
+489
+295
+105
+204
+126
+274
+439
+374
+494
+216
+457
+93
+470
+196
+302
+119
+375
+391
+287
+450
+375
+437
+12
+398
+35
+334
+384
+435
+60
+29
+442
+151
+52
+404
+446
+300
+0
+268
+491
+392
+21
+295
+93
+104
+436
+61
+407
+439
+156
+341
+118
+335
+172
+244
+6
+284
+164
+136
+349
+371
+462
+123
+432
+496
+355
+144
+87
+408
+152
+382
+348
+122
+427
+292
+182
+474
+353
+310
+52
+486
+152
+378
+414
+261
+65
+371
+256
+292
+412
+97
+495
+385
+40
+49
+389
+259
+97
+478
+125
+243
+151
+178
+100
+415
+401
+156
+228
+363
+117
+22
+248
+459
+402
+62
+137
+162
+244
+276
+46
+341
+78
+379
+215
+134
+196
+410
+157
+431
+82
+440
+100
+407
+371
+308
+430
+309
+135
+161
+468
+152
+138
+76
+161
+300
+337
+91
+478
+118
+1
+89
+178
+457
+29
+242
+285
+35
+227
+395
+244
+Time taken: 4.142 seconds
+Moving data to: /tmp/hdfs_out
+OK
+Time taken: 6.714 seconds
+Moved to trash: hdfs://10.2.6.102/tmp/hdfs_out
+Copying data to local directory /tmp/local_out
+Copying data to local directory /tmp/local_out
+OK
+Time taken: 2.445 seconds
+OK
+Time taken: 0.055 seconds
+Loading data to table tmp.result
+Moved to trash: hdfs://10.2.6.102/user/hive/warehouse/tmp.db/result
+OK
+Time taken: 13.618 seconds
+Loading data to table tmp.result
+Moved to trash: hdfs://10.2.6.102/user/hive/warehouse/tmp.db/result
+OK
+Time taken: 3.126 seconds
+Copying data to local directory /tmp/reg_3
+Copying data to local directory /tmp/reg_3
+OK
+Time taken: 17.763 seconds
+Moving data to: /tmp/reg_4
+OK
+Time taken: 4.733 seconds
+Moving data to: /tmp/reg_5
+OK
+Time taken: 4.444 seconds
+Moving data to: /tmp/reg_5
+OK
+Time taken: 8.569 seconds
+Moved to trash: hdfs://10.2.6.102/tmp/reg_4
+Moved to trash: hdfs://10.2.6.102/tmp/reg_5
+Copying data to local directory /tmp/sum
+Copying data to local directory /tmp/sum
+OK
+Time taken: 1.318 seconds
+OK
+Time taken: 0.043 seconds
+Loading data to table tmp.result2
+Moved to trash: hdfs://10.2.6.102/user/hive/warehouse/tmp.db/result2
+OK
+Time taken: 11.275 seconds
+Loading data to table tmp.result2
+Moved to trash: hdfs://10.2.6.102/user/hive/warehouse/tmp.db/result2
+OK
+Time taken: 2.707 seconds
+OK
+Time taken: 0.047 seconds
+Loading data to table tmp.jointest
+Moved to trash: hdfs://10.2.6.102/user/hive/warehouse/tmp.db/jointest
+OK
+Time taken: 1.314 seconds
+OK
+Time taken: 0.201 seconds
+OK
+Time taken: 0.183 seconds
+OK
+Time taken: 0.159 seconds
+OK
+Time taken: 0.144 seconds
+OK
+Time taken: 0.145 seconds
+[INFO] [07/23/2013 11:29:08.972] [spray-io-worker-0] [IoWorker] IoWorker thread 'spray-io-worker-0' stopped
+
+real	1m42.698s
+user	0m30.694s
+sys	0m3.193s
+

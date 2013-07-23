@@ -9,7 +9,7 @@
   <meta name="author" content="Zhu Guangbin">
 
   
-  <meta name="description" content="为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。 测试工具与方法： 之前写过一个benchmark的sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试； 测试方法就是分别利用Hive和Shark的CliDriver: * time &hellip;">
+  <meta name="description" content="为了测试Shark和Hive的执行效率，今天做了下Benchmark的测试对比。 测试工具与方法： 之前写过一个benchmark sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试； 测试方法就是分别利用Hive和Shark的CliDriver: * time &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -96,7 +96,7 @@
 
 <h4>测试工具与方法：</h4>
 
-<p>  之前写过一个benchmark的sql，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试；
+<p>  之前写过一个<a href="/images/benchmark.hql">benchmark sql</a>，利用hive自带的testcase的数据，创建表并进行一些基准HQL的测试；
   测试方法就是分别利用Hive和Shark的CliDriver:</p>
 
 <pre><code>* time hive -f hql_benchmark.sql &gt; hive_test_result 2&gt;&amp;1
@@ -153,6 +153,10 @@
 </tbody>
 </table>
 
+
+<p>  详细结果结果请看：
+ <a href="/images/hive_test_result">hive_test_result</a>
+ <a href="/images/shark_test_result">shark_test_result</a></p>
 
 <h4>测试结果解读：</h4>
 
