@@ -3,7 +3,7 @@ layout: post
 title: "Spark简介"
 date: 2013-07-16 09:58
 comments: true
-categories: 
+categories: Spark
 ---
 
 [Spark](http://spark-project.org/)是UC Berkeley大学[AMPLAB](https://amplab.cs.berkeley.edu/)开源的分布式处理框架。目前已贡献给Apache社区，成为[inbubator项目](http://wiki.apache.org/incubator/SparkProposal)。

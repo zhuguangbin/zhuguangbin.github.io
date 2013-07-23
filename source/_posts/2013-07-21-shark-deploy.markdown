@@ -3,7 +3,7 @@ layout: post
 title: "Shark安装部署与应用"
 date: 2013-07-21 23:07
 comments: true
-categories: 
+categories: Shark 
 ---
 
   在搭建部署Spark之后，我们又引入了[Shark](https://github.com/amplab/shark/wiki)，一个基于Spark的SQL引擎来替换Hive作为adhoc query engine。我的[这篇博客](http://zhuguangbin.github.io/blog/2013/07/09/shark-introduction/)对Shark有简单的介绍。

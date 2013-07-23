@@ -3,7 +3,7 @@ layout: post
 title: "Spark安装部署篇"
 date: 2013-07-16 11:58
 comments: true
-categories: 
+categories: Spark
 ---
 
   Spark有以下四种运行模式：

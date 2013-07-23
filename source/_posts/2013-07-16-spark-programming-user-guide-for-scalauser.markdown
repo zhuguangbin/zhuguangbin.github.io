@@ -3,7 +3,7 @@ layout: post
 title: "Spark Programming User Guide For Scala User"
 date: 2013-07-16 16:37
 comments: true
-categories: 
+categories: Spark
 ---
 
 ### 概述

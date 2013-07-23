@@ -3,7 +3,7 @@ layout: post
 title: "Spark Programming User Guide Basic"
 date: 2013-07-16 16:27
 comments: true
-categories: 
+categories: Spark
 ---
 
 ### 开发环境搭建

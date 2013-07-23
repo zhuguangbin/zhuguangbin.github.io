@@ -3,7 +3,7 @@ layout: post
 title: "My first blog on GitHub"
 date: 2013-07-07 17:15
 comments: true
-categories: 
+categories: unknown
 ---
 
 之前的Blog由于欠费被停了，而且也觉得每年花费那200块钱不值得，故找了找免费的Blog，意外发现了Github Pages，惊喜~

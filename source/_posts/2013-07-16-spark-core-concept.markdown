@@ -3,7 +3,7 @@ layout: post
 title: "Spark核心思想篇"
 date: 2013-07-16 10:58
 comments: true
-categories: 
+categories: Spark
 ---
 
 
