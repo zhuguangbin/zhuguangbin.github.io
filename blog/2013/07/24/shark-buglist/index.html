@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Shark BugList - Data Talks</title>
+  <meta name="author" content="Zhu Guangbin">
+
+  
+  <meta name="description" content="本篇记录在使用shark的过程中遇到过的一些坑，然后我们就开始填坑。。。 坑1
+SQL: FROM pokes t1 JOIN invites t2 ON (t1.bar = t2.bar) INSERT OVERWRITE TABLE jointest SELECT t1.bar, t1.foo &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://zhuguangbin.github.io/blog/2013/07/24/shark-buglist/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Data Talks" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:zhuguangbin.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/">
+        <span class="blue_light">
+            Data Talks
+        </span>
+       
+           <span class="blue_dark">
+             Play with Hadoop/Hive/HBase/Spark/Shark
+           </span>
+       
+    </a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About me</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Shark BugList</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-24T16:25:00+08:00" pubdate data-updated="true">Jul 24<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>本篇记录在使用shark的过程中遇到过的一些坑，然后我们就开始填坑。。。</p>
+
+<!-- more -->
+
+
+<ol>
+<li><p>坑1</p></li>
+<li><p>SQL:
+    FROM pokes t1 JOIN invites t2 ON (t1.bar = t2.bar) INSERT OVERWRITE TABLE jointest SELECT t1.bar, t1.foo, t2.bar, t2.foo;</p></li>
+<li><p>错误描述：
+Client报错如下，会一直hang住</p>
+
+<pre><code>  cluster.TaskSetManager: Loss was due to java.lang.ArrayIndexOutOfBoundsException
+      at java.lang.System.arraycopy(Native Method)
+      at org.apache.hadoop.io.Text.set(Text.java:205)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
+      at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
+      at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
+      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
+      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
+      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+      at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
+      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+      at scala.collection.Iterator$class.foreach(Iterator.scala:772)
+      at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
+      at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
+      at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
+      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+      at spark.scheduler.ResultTask.run(ResultTask.scala:77)
+      at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+      at java.lang.Thread.run(Thread.java:662)
+</code></pre>
+
+<p>Worker节点上报错：</p>
+
+<pre><code>  java.lang.ArrayIndexOutOfBoundsException
+      at java.lang.System.arraycopy(Native Method)
+      at org.apache.hadoop.io.Text.set(Text.java:205)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
+      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
+      at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
+      at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
+      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
+      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
+      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+      at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
+      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+      at scala.collection.Iterator$class.foreach(Iterator.scala:772)
+      at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
+      at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
+      at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
+      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+      at spark.scheduler.ResultTask.run(ResultTask.scala:77)
+      at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+      at java.lang.Thread.run(Thread.java:662)
+</code></pre>
+
+<ul>
+<li>解决方案：切换成amplab的hive版本后就没有这个问题，原因是我们的hive版本是基于官方0.9.0patch而来，而官方的hive在多线程下会有concurrency的问题，amplab的hive版本修复了这些bug。shark user group上有人讨论这个<a href="https://groups.google.com/forum/#!searchin/shark-users/ArrayIndexOutOfBoundsException/shark-users/OfaZZcYhv2Q/W7HizKk4-54J">问题</a>
+我们后边引入amplab的这些bugfix</li>
+</ul>
+</li>
+<li><p>坑2</p></li>
+<li><p>SQL：
+    select count(distinct b.deviceid, a.curr_version)
+    from bi.dpmid_mb_deviceid a
+    join bi.dpdm_device_user b on (a.device_id = b.deviceid)
+    join bi.dpdm_user_tg_category c on (b.userid = c.userid)
+    join bi.dpdm_device_permanent_city_plus d on (a.device_id = d.deviceid and d.cityid = 3 and d.last_day = &lsquo;2013-05-15&rsquo;)
+    where c.cat_name = &lsquo;面包甜点&rsquo; and &mdash;a.curr_version >= &lsquo;5.5.6&rsquo; and
+     c.cityid = 3 and a.train_id = 10;</p></li>
+<li><p>错误描述：</p></li>
+</ol>
+
+
+<p>  client报OOM，并一直hang住</p>
+
+<pre><code>    13/07/24 16:21:44 INFO cluster.TaskSetManager: Loss was due to java.lang.OutOfMemoryError: GC overhead limit exceeded
+        at scala.collection.mutable.ResizableArray$class.$init$(ResizableArray.scala:33)
+        at scala.collection.mutable.ArrayBuffer.&lt;init&gt;(ArrayBuffer.scala:47)
+        at scala.collection.mutable.ArrayBuffer.&lt;init&gt;(ArrayBuffer.scala:61)
+        at spark.CoGroupedRDD$$anonfun$getSeq$1$1.apply(CoGroupedRDD.scala:106)
+        at spark.CoGroupedRDD$$anonfun$getSeq$1$1.apply(CoGroupedRDD.scala:106)
+        at scala.Array$.fill(Array.scala:239)
+        at spark.CoGroupedRDD.getSeq$1(CoGroupedRDD.scala:106)
+        at spark.CoGroupedRDD$$anonfun$compute$2.mergePair$1(CoGroupedRDD.scala:118)
+        at spark.CoGroupedRDD$$anonfun$compute$2$$anonfun$apply$5.apply(CoGroupedRDD.scala:120)
+        at spark.CoGroupedRDD$$anonfun$compute$2$$anonfun$apply$5.apply(CoGroupedRDD.scala:120)
+        at scala.collection.Iterator$class.foreach(Iterator.scala:772)
+        at spark.util.CompletionIterator.foreach(CompletionIterator.scala:6)
+        at spark.CoGroupedRDD$$anonfun$compute$2.apply(CoGroupedRDD.scala:120)
+        at spark.CoGroupedRDD$$anonfun$compute$2.apply(CoGroupedRDD.scala:111)
+        at scala.collection.LinearSeqOptimized$class.foreach(LinearSeqOptimized.scala:59)
+        at scala.collection.immutable.List.foreach(List.scala:76)
+        at spark.CoGroupedRDD.compute(CoGroupedRDD.scala:111)
+        at spark.RDD.computeOrReadCheckpoint(RDD.scala:207)
+        at spark.RDD.iterator(RDD.scala:196)
+        at spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:19)
+        at spark.RDD.computeOrReadCheckpoint(RDD.scala:207)
+        at spark.RDD.iterator(RDD.scala:196)
+        at spark.rdd.MapPartitionsWithIndexRDD.compute(MapPartitionsWithIndexRDD.scala:23)
+        at spark.RDD.computeOrReadCheckpoint(RDD.scala:207)
+        at spark.RDD.iterator(RDD.scala:196)
+        at spark.scheduler.ShuffleMapTask.run(ShuffleMapTask.scala:127)
+        at spark.scheduler.ShuffleMapTask.run(ShuffleMapTask.scala:75)
+        at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+        at java.lang.Thread.run(Thread.java:662)
+    13/07/24 16:22:43 WARN storage.BlockManagerMasterActor: Removing BlockManager BlockManagerId(0, cosmos133.hadoop, 44818) with no recent heart beats
+</code></pre>
+
+<ul>
+<li><p>解决方案： set mapred.reduce.tasks=100;</p>
+
+<p>shark user group上有人讨论这个<a href="https://groups.google.com/forum/#!searchin/shark-users/Loss$20was$20due$20to$20java.lang.OutOfMemoryError$3A$20GC$20overhead$20limit$20exceeded/shark-users/Kb8DEWGoLkc/x7W2rDWIHl0J">问题</a></p></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Zhu Guangbin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-24T16:25:00+08:00" pubdate data-updated="true">Jul 24<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/shark/'>Shark</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_share_slide jiathis_share_32x32" id="jiathis_share_slide">
+<div class="jiathis_share_slide_top" id="jiathis_share_title"></div>
+<div class="jiathis_share_slide_inner">
+<div class="jiathis_style_32x32">
+<a class="jiathis_button_qzone"></a>
+<a class="jiathis_button_tsina"></a>
+<a class="jiathis_button_tqq"></a>
+<a class="jiathis_button_renren"></a>
+<a class="jiathis_button_kaixin001"></a>
+<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+<script type="text/javascript">
+var jiathis_config = {
+	slide:{
+		divid:'jiathis_main',//设定分享按钮的位置在哪个DIV的边缘，一般是主体内容的外层DIV框架ID,
+		pos:'left'
+	}
+};
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1370008824857845" charset="utf-8"></script>	
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_slide.js" charset="utf-8"></script>
+</div></div></div>
+<!-- JiaThis Button END -->
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://zhuguangbin.github.io/blog/2013/07/24/shark-buglist/" data-via="" data-counturl="http://zhuguangbin.github.io/blog/2013/07/24/shark-buglist/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/07/23/hive-principal-introduction-and-shark-introduction/" title="Previous Post: Hive principal introduction and shark introduction">&laquo; Hive principal introduction and shark introduction</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <div style="margin-top:15px; ">
+<img style="" class="left" src="http://m.c.lnkd.licdn.com/media/p/4/000/159/074/24c4d84.jpg">
+<p><a href="http://zhuguangbin.github.io">Zhu Guangbin</a></p>
+<p>Senior Software Engineer @DianPing</p>
+<br>
+<p>Focusing on BigData, <br>
+Play with Hadoop/Hive/HBase/Spark/Shark</p>
+Linkedin: <a href="http://www.linkedin.com/in/zhuguangbin">Zhu Guangbin</a><br>
+SinaWeibo: <a href="http://weibo.com/2406795361/profile">BigDataPlayer</a><br>
+Email: <a href="mailto:zhu.guangbin86@gmail.com">zhu.guangbin86@gmail.com</a><br>
+</div>
+</section>
+
+<section>
+  <h1>新浪微博</h1>
+  <ul id="weibo">
+    <li>
+      <iframe 
+        width="100%" 
+        height="550" 
+        class="share_self" 
+        frameborder="0" 
+        scrolling="no" 
+        src="http://widget.weibo.com/weiboshow/index.php?width=0&height=550&ptype=1&speed=0&skin=&isTitle=0&noborder=1&isWeibo=1&isFans=&uid=2406795361&verifier=f1586320">
+      </iframe>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/hive/'>Hive (1)</a></li>
+<li class='category'><a href='/blog/categories/shark/'>Shark (4)</a></li>
+<li class='category'><a href='/blog/categories/spark/'>Spark (7)</a></li>
+<li class='category'><a href='/blog/categories/unknown/'>unknown (1)</a></li>
+
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/07/24/shark-buglist/">Shark BugList</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/23/hive-principal-introduction-and-shark-introduction/">Hive principal introduction and shark introduction</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/23/shark-vs-hive-benchmark-test/">Shark vs Hive Benchmark Test</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/21/shark-deploy/">Shark安装部署与应用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/16/spark-programming-examples/">Spark Programming Examples</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Zhu Guangbin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhuguangbin';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://zhuguangbin.github.io/blog/2013/07/24/shark-buglist/';
+        var disqus_url = 'http://zhuguangbin.github.io/blog/2013/07/24/shark-buglist/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
