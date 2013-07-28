@@ -9,8 +9,7 @@
   <meta name="author" content="Zhu Guangbin">
 
   
-  <meta name="description" content="本篇记录在使用shark的过程中遇到过的一些坑，然后我们就开始填坑。。。 坑1
-SQL: FROM pokes t1 JOIN invites t2 ON (t1.bar = t2.bar) INSERT OVERWRITE TABLE jointest SELECT t1.bar, t1.foo &hellip;">
+  <meta name="description" content="本篇记录在使用shark的过程中遇到过的一些坑，然后我们就开始填坑。。。 坑1 SQL: FROM pokes t1 JOIN invites t2 ON (t1.bar = t2.bar) INSERT OVERWRITE TABLE jointest SELECT t1.bar, t1.foo &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -102,81 +101,96 @@ SQL: FROM pokes t1 JOIN invites t2 ON (t1.bar = t2.bar) INSERT OVERWRITE TABLE j
 
 
 <ol>
-<li><p>坑1</p></li>
-<li><p>SQL:
-    FROM pokes t1 JOIN invites t2 ON (t1.bar = t2.bar) INSERT OVERWRITE TABLE jointest SELECT t1.bar, t1.foo, t2.bar, t2.foo;</p></li>
-<li><p>错误描述：
-Client报错如下，会一直hang住</p>
-
-<pre><code>  cluster.TaskSetManager: Loss was due to java.lang.ArrayIndexOutOfBoundsException
-      at java.lang.System.arraycopy(Native Method)
-      at org.apache.hadoop.io.Text.set(Text.java:205)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
-      at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
-      at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
-      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
-      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
-      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
-      at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
-      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
-      at scala.collection.Iterator$class.foreach(Iterator.scala:772)
-      at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
-      at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
-      at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
-      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
-      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
-      at spark.scheduler.ResultTask.run(ResultTask.scala:77)
-      at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
-      at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
-      at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
-      at java.lang.Thread.run(Thread.java:662)
-</code></pre>
-
-<p>Worker节点上报错：</p>
-
-<pre><code>  java.lang.ArrayIndexOutOfBoundsException
-      at java.lang.System.arraycopy(Native Method)
-      at org.apache.hadoop.io.Text.set(Text.java:205)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
-      at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
-      at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
-      at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
-      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
-      at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
-      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
-      at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
-      at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
-      at scala.collection.Iterator$class.foreach(Iterator.scala:772)
-      at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
-      at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
-      at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
-      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
-      at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
-      at spark.scheduler.ResultTask.run(ResultTask.scala:77)
-      at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
-      at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
-      at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
-      at java.lang.Thread.run(Thread.java:662)
-</code></pre>
+<li><p>坑1</p>
 
 <ul>
-<li>解决方案：切换成amplab的hive版本后就没有这个问题，原因是我们的hive版本是基于官方0.9.0patch而来，而官方的hive在多线程下会有concurrency的问题，amplab的hive版本修复了这些bug。shark user group上有人讨论这个<a href="https://groups.google.com/forum/#!searchin/shark-users/ArrayIndexOutOfBoundsException/shark-users/OfaZZcYhv2Q/W7HizKk4-54J">问题</a>
-我们后边引入amplab的这些bugfix</li>
+<li><p>SQL:</p>
+
+<pre><code> FROM pokes t1 JOIN invites t2 ON (t1.bar = t2.bar) INSERT OVERWRITE TABLE jointest SELECT t1.bar, t1.foo, t2.bar, t2.foo;
+</code></pre></li>
+<li><p>错误描述：</p></li>
 </ul>
 </li>
-<li><p>坑2</p></li>
-<li><p>SQL：
-    select count(distinct b.deviceid, a.curr_version)
-    from bi.dpmid_mb_deviceid a
-    join bi.dpdm_device_user b on (a.device_id = b.deviceid)
-    join bi.dpdm_user_tg_category c on (b.userid = c.userid)
-    join bi.dpdm_device_permanent_city_plus d on (a.device_id = d.deviceid and d.cityid = 3 and d.last_day = &lsquo;2013-05-15&rsquo;)
-    where c.cat_name = &lsquo;面包甜点&rsquo; and &mdash;a.curr_version >= &lsquo;5.5.6&rsquo; and
-     c.cityid = 3 and a.train_id = 10;</p></li>
+</ol>
+
+
+<p>  Client报错如下，会一直hang住</p>
+
+<pre><code>    cluster.TaskSetManager: Loss was due to java.lang.ArrayIndexOutOfBoundsException
+        at java.lang.System.arraycopy(Native Method)
+        at org.apache.hadoop.io.Text.set(Text.java:205)
+        at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
+        at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
+        at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
+        at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
+        at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
+        at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
+        at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
+        at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+        at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
+        at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+        at scala.collection.Iterator$class.foreach(Iterator.scala:772)
+        at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
+        at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
+        at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
+        at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+        at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+        at spark.scheduler.ResultTask.run(ResultTask.scala:77)
+        at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+        at java.lang.Thread.run(Thread.java:662)
+</code></pre>
+
+<p>  Worker节点上报错：</p>
+
+<pre><code>    java.lang.ArrayIndexOutOfBoundsException
+        at java.lang.System.arraycopy(Native Method)
+        at org.apache.hadoop.io.Text.set(Text.java:205)
+        at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryString.init(LazyBinaryString.java:48)
+        at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.uncheckedGetField(LazyBinaryStruct.java:216)
+        at org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryStruct.getField(LazyBinaryStruct.java:197)
+        at org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector.getStructFieldData(LazyBinaryStructObjectInspector.java:61)
+        at org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator.evaluate(ExprNodeColumnEvaluator.java:102)
+        at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:169)
+        at shark.execution.JoinOperator$$anonfun$generateTuples$1.apply(JoinOperator.scala:154)
+        at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+        at scala.collection.Iterator$$anon$21.next(Iterator.scala:441)
+        at scala.collection.Iterator$$anon$19.next(Iterator.scala:401)
+        at scala.collection.Iterator$class.foreach(Iterator.scala:772)
+        at scala.collection.Iterator$$anon$19.foreach(Iterator.scala:399)
+        at shark.execution.FileSinkOperator.processPartition(FileSinkOperator.scala:73)
+        at shark.execution.FileSinkOperator$.writeFiles$1(FileSinkOperator.scala:158)
+        at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+        at shark.execution.FileSinkOperator$$anonfun$executeProcessFileSinkPartition$1.apply(FileSinkOperator.scala:162)
+        at spark.scheduler.ResultTask.run(ResultTask.scala:77)
+        at spark.executor.Executor$TaskRunner.run(Executor.scala:98)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+        at java.lang.Thread.run(Thread.java:662)
+
+* 解决方案：切换成amplab的hive版本后就没有这个问题，原因是我们的hive版本是基于官方0.9.0patch而来，而官方的hive在多线程下会有concurrency的问题，amplab的hive版本修复了这些bug。shark user group上有人讨论这个[问题](https://groups.google.com/forum/#!searchin/shark-users/ArrayIndexOutOfBoundsException/shark-users/OfaZZcYhv2Q/W7HizKk4-54J)
+</code></pre>
+
+<p>  我们后边引入amplab的这些bugfix</p>
+
+<ol>
+<li><p>坑2</p>
+
+<ul>
+<li><p>SQL：</p>
+
+<pre><code> select count(distinct b.deviceid, a.curr_version)
+ from bi.dpmid_mb_deviceid a
+ join bi.dpdm_device_user b on (a.device_id = b.deviceid)
+ join bi.dpdm_user_tg_category c on (b.userid = c.userid)
+ join bi.dpdm_device_permanent_city_plus d on (a.device_id = d.deviceid and d.cityid = 3 and d.last_day = '2013-05-15')
+ where c.cat_name = '面包甜点' and --a.curr_version &gt;= '5.5.6' and
+  c.cityid = 3 and a.train_id = 10;
+</code></pre></li>
 <li><p>错误描述：</p></li>
+</ul>
+</li>
 </ol>
 
 
@@ -218,7 +232,9 @@ Client报错如下，会一直hang住</p>
 </code></pre>
 
 <ul>
-<li><p>解决方案： set mapred.reduce.tasks=100;</p>
+<li><p> 解决方案：</p>
+
+<p> set mapred.reduce.tasks=100;</p>
 
 <p>shark user group上有人讨论这个<a href="https://groups.google.com/forum/#!searchin/shark-users/Loss$20was$20due$20to$20java.lang.OutOfMemoryError$3A$20GC$20overhead$20limit$20exceeded/shark-users/Kb8DEWGoLkc/x7W2rDWIHl0J">问题</a></p></li>
 </ul>
